@@ -16,7 +16,6 @@ import com.ShomazzApp.drumhero.utils.MySurfaceView;
 public class GameEndedActivity extends Activity {
 
 
-
     private int tappedButtonId;
     private RelativeLayout rlayGameEnded;
     public static float sizeCoff;
@@ -65,7 +64,7 @@ public class GameEndedActivity extends Activity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_game_ended);
-      //  Appodeal.show(this, Appodeal.BANNER_TOP);
+        //  Appodeal.show(this, Appodeal.BANNER_TOP);
         rlayGameEnded = (RelativeLayout) findViewById(R.id.rlayGameEnded);
         im = (ImageView) findViewById(R.id.imageViewOnGameEnded);
         if (getIntent().getBooleanExtra(getString(R.string.GameEndedIntentWin), true)) {
@@ -82,10 +81,13 @@ public class GameEndedActivity extends Activity {
         sizeCoff = MySurfaceView.myDeviceWidth / getResources().getDisplayMetrics().widthPixels;
         System.out.println("From GameEnded sizeCoff = " + MySurfaceView.myDeviceHeight + " / "
                 + getResources().getDisplayMetrics().heightPixels + " = " + sizeCoff);
-        if (sizeCoff >= 3.0f)
+        if (sizeCoff >= 3.0f) {
             sizeCoff /= 1.3f;
-        tViewScore.setText(getIntent().getExtras().getInt(getString(R.string.GameEndedIntentScore)) + "");
-        tViewBestScore.setText(getIntent().getExtras().getInt(getString(R.string.GameEndedIntentBestScore)) + "");
+        }
+        tViewScore.setText(
+                getIntent().getExtras().getInt(getString(R.string.GameEndedIntentScore)) + "");
+        tViewBestScore.setText(
+                getIntent().getExtras().getInt(getString(R.string.GameEndedIntentBestScore)) + "");
         /*tViewScore.setTextSize(17 * getResources().getDisplayMetrics().density);
         tViewBestScore.setTextSize(13 * getResources().getDisplayMetrics().density);*/
         tViewScore.setTextSize(30f / sizeCoff);
@@ -94,21 +96,13 @@ public class GameEndedActivity extends Activity {
         btnRestart.setOnTouchListener(onTouchListener);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-       // Appodeal.onResume(this, Appodeal.BANNER_TOP);
-    }
-
-    public void startNeededActivity(){
+    public void startNeededActivity() {
         if (tappedButtonId == R.id.btnRestart) {
-            if (GameActivity.titleByName != null) {
-                intentGameActivity.putExtra(getString(R.string.GameIntentSongPath), nothing);
-                startActivity(intentGameActivity);
-            } else {
-                startActivity(intentMainMenu);
-            }
-        } else startActivity(intentMainMenu);
+            intentGameActivity.putExtra(getString(R.string.GameIntentSongPath), nothing);
+            startActivity(intentMainMenu);
+        } else {
+            startActivity(intentMainMenu);
+        }
     }
 
     @Override

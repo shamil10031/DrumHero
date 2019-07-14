@@ -64,7 +64,7 @@ public class FileExplore extends Activity {
         editNameOfSongFromStorage = (EditText) findViewById(R.id.editNameOfSongFromStorage);
         editNameOfArtistFromStorage = (EditText) findViewById(R.id.editNameOfArtistFromStorage);
         rlay = (RelativeLayout) findViewById(R.id.saveSongViewFromStorage);
-        t = Toast.makeText(this, "Choose MIDI file (.mid)!", 3500);
+        t = Toast.makeText(this, "Choose MIDI file (.mid)!", Toast.LENGTH_LONG);
         inn = new Intent(this, ConstructorActivity.class);
         constructorFile = null;
     }
@@ -78,7 +78,7 @@ public class FileExplore extends Activity {
                     || editNameOfArtistFromStorage.getText().toString().equals("")
                     || editNameOfSongFromStorage.getText().toString().equals(" ")
                     || editNameOfArtistFromStorage.getText().toString().equals(" ")) {
-                Toast t = Toast.makeText(this, "Fill In The Gaps", 3000);
+                Toast t = Toast.makeText(this, "Fill In The Gaps", Toast.LENGTH_LONG);
                 t.show();
             } else {
                 Song s = new Song(
@@ -91,11 +91,11 @@ public class FileExplore extends Activity {
                         constructorFile.getName(), SongsActivity.songArrayList
                         .size() + 1);
 
-                System.out.println("From FileExplore onPushNames() constructorFile.getAbsolutePath =  "
-                        + constructorFile.getAbsolutePath());
+                System.out.println(
+                        "From FileExplore onPushNames() constructorFile.getAbsolutePath =  "
+                                + constructorFile.getAbsolutePath());
                 AddToDB2 toDBTask2 = new AddToDB2(s, constructorFile);
                 toDBTask2.execute();
-                SongsActivity.adapter.notifyDataSetChanged();
                 editNameOfSongFromStorage.setText("");
                 editNameOfArtistFromStorage.setText("");
                 rlay.setVisibility(View.GONE);
@@ -103,46 +103,10 @@ public class FileExplore extends Activity {
         } else {
             loadFileList();
             showDialog(DIALOG_LOAD_FILE);
-            Toast t = Toast.makeText(this, "Choose File!", 3500);
+            Toast t = Toast.makeText(this, "Choose File!", Toast.LENGTH_LONG);
             t.show();
         }
     }
-
-/*    public void onPushNamesFromStorage(View v) {
-        if (editNameOfSongFromStorage.getText().toString().equals(null)
-                || editNameOfArtistFromStorage.getText().toString()
-                .equals(null)
-                || editNameOfSongFromStorage.getText().toString().equals("")
-                || editNameOfArtistFromStorage.getText().toString().equals("")
-                || editNameOfSongFromStorage.getText().toString().equals(" ")
-                || editNameOfArtistFromStorage.getText().toString().equals(" ")) {
-            Toast t = Toast.makeText(this, "Fill In The Gaps", 3000);
-            t.show();
-        } else {
-            if (constructorFile != null) {
-                Song s = new Song(
-                        editNameOfSongFromStorage.getText().toString(),
-                        editNameOfArtistFromStorage.getText().toString(),
-                        Song.makeTableName(editNameOfSongFromStorage.getText()
-                                .toString()
-                                + " - "
-                                + editNameOfArtistFromStorage.getText().toString()),
-                        constructorFile.getName(), SongsActivity.songArrayList
-                        .size() + 1);
-                System.out.println("From FileExplore onPushNames() constructorFile.getAbsolutePath =  "
-                        + constructorFile.getAbsolutePath());
-                AddToDB2 toDBTask2 = new AddToDB2(s, constructorFile);
-                toDBTask2.execute();
-                SongsActivity.adapter.notifyDataSetChanged();
-                editNameOfSongFromStorage.setText("");
-                editNameOfArtistFromStorage.setText("");
-                rlay.setVisibility(View.GONE);
-            } else {
-                Toast t = Toast.makeText(this, "Choose File!", 3500);
-                t.show();
-            }
-        }
-    }*/
 
     @Override
     public void onBackPressed() {
@@ -159,15 +123,12 @@ public class FileExplore extends Activity {
 
         // Checks whether path exists
         if (path.exists()) {
-            FilenameFilter filter = new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, String filename) {
-                    File sel = new File(dir, filename);
-                    // Filters based on whether the file is hidden or not
-                    return (sel.isFile() || sel.isDirectory())
-                            && !sel.isHidden();
+            FilenameFilter filter = (dir, filename) -> {
+                File sel = new File(dir, filename);
+                // Filters based on whether the file is hidden or not
+                return (sel.isFile() || sel.isDirectory())
+                        && !sel.isHidden();
 
-                }
             };
 
             String[] fList = path.list(filter);
@@ -286,7 +247,8 @@ public class FileExplore extends Activity {
                                 }
                                 try {
                                     String destPath = Environment.getExternalStorageDirectory()
-                                            .toString() + ConstructorActivity.MUSICFOLDER + "/" + constructorFile.getName();
+                                            .toString() + ConstructorActivity.MUSICFOLDER + "/" +
+                                            constructorFile.getName();
                                     FileInputStream in = new FileInputStream(constructorFile);
                                     OutputStream out = new FileOutputStream(destPath);
 
@@ -304,8 +266,9 @@ public class FileExplore extends Activity {
                                     Log.v("TAG", "ioexeption");
                                     e.printStackTrace();
                                 }
-                                System.out.println("FromFileExplore constructorFile.getAbsolutePath == "
-                                        + constructorFile.getAbsolutePath());
+                                System.out.println(
+                                        "FromFileExplore constructorFile.getAbsolutePath == "
+                                                + constructorFile.getAbsolutePath());
                             } else {
                                 t.show();
                                 removeDialog(DIALOG_LOAD_FILE);
@@ -364,6 +327,7 @@ public class FileExplore extends Activity {
     }
 
     private class Item {
+
         public String file;
         public int icon;
 

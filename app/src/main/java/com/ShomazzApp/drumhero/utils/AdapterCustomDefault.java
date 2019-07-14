@@ -50,13 +50,10 @@ public class AdapterCustomDefault extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         Holder holder = new Holder ();
-        View view;
-        view = inflater.inflate(R.layout.list_item_default, null);
+        View view = inflater.inflate(R.layout.list_item_default, null);
         holder.songTV=(TextView) view.findViewById(R.id.listViewDefaultSong);
         holder.bestScoreTV=(TextView) view.findViewById(R.id.listViewScore);
         sizeCoff = MySurfaceView.myDeviceWidth / context.getResources().getDisplayMetrics().widthPixels;
-        /*System.out.println("From AdapterCustomDef sizeCoff == " + MySurfaceView.myDeviceWidth
-                + " / " + context.getResources().getDisplayMetrics().widthPixels + " == " + sizeCoff);*/
         if (sizeCoff >= 3.0f){
             sizeCoff /= 1.9f;
         }

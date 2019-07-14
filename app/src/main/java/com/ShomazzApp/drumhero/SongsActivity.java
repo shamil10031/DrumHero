@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteException;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -13,8 +14,6 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
@@ -30,6 +29,7 @@ import com.ShomazzApp.drumhero.game.Game;
 import com.ShomazzApp.drumhero.game.Song;
 import com.ShomazzApp.drumhero.utils.AdapterCustomCloud;
 import com.ShomazzApp.drumhero.utils.AdapterCustomDefault;
+import com.ShomazzApp.drumhero.utils.ResourcesHelper;
 import com.ShomazzApp.drumhero.utils.DBManager;
 import com.ShomazzApp.drumhero.utils.MySurfaceView;
 
@@ -50,23 +50,21 @@ import java.util.regex.Pattern;
 
 public class SongsActivity extends Activity {
 
-    private static View footerView;
+    private View footerView;
     private static final String site = "http://www.midiworld.com/search/?q=rock";
     public static float sizeCoff;
     public static boolean beginnerMode = true;
     public static ArrayList<Song> songArrayList;
-    public static AdapterCustomDefault adapter;
-    public static AdapterCustomCloud adapterWeb;
-    private static boolean defaultListView = true;
-    private static SharedPreferences mSettings;
-    private static Button btnCloudDownload, btnStorage, btnYes, btnNo, btnBack, btnViewMore;
+    public AdapterCustomDefault adapter;
+    public AdapterCustomCloud adapterWeb;
+    private SharedPreferences mSettings;
+    private Button btnCloudDownload, btnStorage, btnYes, btnNo, btnBack, btnViewMore;
     private static Intent intentGameActivity = new Intent();
     private static Intent intentAddSong = new Intent();
     private static Intent intentMainMenu = new Intent();
     private static Intent intentSettingsActivity = new Intent();
     private boolean deleteSongsMode = false;
     private RadioGroup radioGroupDifficulty;
-    private RadioGroup radioGroupMode;
     private ImageView songsImageView;
     private int difficulty;
     private int mode = Game.GAME;
@@ -78,31 +76,56 @@ public class SongsActivity extends Activity {
     private RelativeLayout rlayDeleteSongs;
     private RelativeLayout rlayDeleteSongsAccept;
     private RelativeLayout rlayBackButton;
-    private Animation anim;
     private ListView listView;
     private String root;
     private ProgressDialog pDialog;
     private ArrayList<String> scores;
     private Toast songDeletedToast;
-    private Toast notPickedToast;
-    private MTSK mtsk = new MTSK();
     private static String currentSite;
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        footerView = null;
+        btnCloudDownload = null;
+        btnStorage = null;
+        btnYes = null;
+        btnNo = null;
+        btnBack = null;
+        btnViewMore = null;
+        songArrayList = null;
+        radioGroupDifficulty = null;
+        songsImageView = null;
+        checkB = null;
+        rlayAdd = null;
+        rlayStartSong = null;
+        rlayDeleteSongsAccept = null;
+        rlayBackButton = null;
+        listView = null;
+        pDialog = null;
+        songDeletedToast = null;
+    }
 
     private OnItemClickListener onItemClickListener = new OnItemClickListener() {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view,
-                                int position, long id) {
+                int position, long id) {
             if (rlayAdd.getVisibility() == View.GONE
                     && rlayStartSong.getVisibility() == View.GONE) {
                 if (!deleteSongsMode) {
                     DBManager.getInstance(getApplicationContext());
                     activeSong = songArrayList.get(position);
-                    intentGameActivity.putExtra(getString(R.string.GameIntentSongPath), root + ConstructorActivity.MUSICFOLDER + "/" + activeSong.getFileName());
-                    intentGameActivity.putExtra(getString(R.string.GameIntentTableName), activeSong.getTableName());
-                    intentGameActivity.putExtra(getString(R.string.GameIntentTitleByName), activeSong.getTitleByName());
+                    intentGameActivity.putExtra(getString(R.string.GameIntentSongPath),
+                            root + ConstructorActivity.MUSICFOLDER + "/" +
+                                    activeSong.getFileName());
+                    intentGameActivity.putExtra(getString(R.string.GameIntentTableName),
+                            activeSong.getTableName());
+                    intentGameActivity.putExtra(getString(R.string.GameIntentTitleByName),
+                            activeSong.getTitleByName());
                     rlayStartSong.setVisibility(View.VISIBLE);
-                    System.out.println("FromOnItemClick root+musicfolder+fileName == " + root + ConstructorActivity.MUSICFOLDER + "/"
+                    System.out.println("FromOnItemClick root+musicfolder+fileName == " + root +
+                            ConstructorActivity.MUSICFOLDER + "/"
                             + activeSong.getFileName());
                 } else {
                     activeSong = songArrayList.get(position);
@@ -125,7 +148,8 @@ public class SongsActivity extends Activity {
                             break;
                         case R.id.btn_cloud_download:
                             if (rlayStartSong.getVisibility() == View.GONE) {
-                                btnCloudDownload.setBackgroundResource(R.drawable.ic_cloud_download_holded);
+                                btnCloudDownload.setBackgroundResource(
+                                        R.drawable.ic_cloud_download_holded);
                             }
                             break;
                         case R.id.btnAgreeDeleteSong:
@@ -158,8 +182,8 @@ public class SongsActivity extends Activity {
                             break;
                         case R.id.btn_cloud_download:
                             if (rlayStartSong.getVisibility() == View.GONE) {
-                                defaultListView = false;
-                                btnCloudDownload.setBackgroundResource(R.drawable.ic_cloud_download_white_24dp);
+                                btnCloudDownload.setBackgroundResource(
+                                        R.drawable.ic_cloud_download_white_24dp);
                                 new LoadSongsFromWebThread().execute();
                                 btnCloudDownload.setVisibility(View.GONE);
                                 btnStorage.setVisibility(View.GONE);
@@ -204,37 +228,6 @@ public class SongsActivity extends Activity {
         }
     };
 
-    public static void copySong(String nameOfSong, Context context) {
-        if (!new File(Environment.getExternalStorageDirectory()
-                + ConstructorActivity.MUSICFOLDER + "/" + nameOfSong).exists()) {
-            try {
-                File musicFolder = new File(Environment.getExternalStorageDirectory().toString()
-                        + ConstructorActivity.MUSICFOLDER);
-                if (!musicFolder.exists()) {
-                    musicFolder.mkdir();
-                }
-                String destPath = Environment.getExternalStorageDirectory()
-                        .toString() + ConstructorActivity.MUSICFOLDER + "/" + nameOfSong;
-                InputStream in = context.getAssets().open(nameOfSong);
-                OutputStream out = new FileOutputStream(destPath);
-
-                byte[] buffer = new byte[1024];
-                int length;
-                while ((length = in.read(buffer)) > 0) {
-                    out.write(buffer, 0, length);
-                }
-                in.close();
-                out.close();
-
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                Log.v("TAG", "ioexeption");
-                e.printStackTrace();
-            }
-        }
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -242,12 +235,12 @@ public class SongsActivity extends Activity {
         setContentView(R.layout.activity_songs);
         footerView = getLayoutInflater().inflate(R.layout.list_item_view_more_song, null);
         btnViewMore = (Button) footerView.findViewById(R.id.btn_view_more);
-        defaultListView = true;
         currentSite = site;
         checkB = (CheckBox) findViewById(R.id.checkBbox);
         mSettings = getSharedPreferences(SettingsActivity.APP_PREFERENCES, MODE_PRIVATE);
         if (mSettings.contains(SettingsActivity.APP_PREFERENCES_BEGINNERMODE)) {
-            beginnerMode = mSettings.getBoolean(SettingsActivity.APP_PREFERENCES_BEGINNERMODE, false);
+            beginnerMode = mSettings.getBoolean(SettingsActivity.APP_PREFERENCES_BEGINNERMODE,
+                    false);
         } else {
             beginnerMode = false;
         }
@@ -260,10 +253,11 @@ public class SongsActivity extends Activity {
         checkB.setChecked(beginnerMode);
         mode = Game.GAME;
         difficulty = 10;
-        deleteSongsMode = getIntent().getBooleanExtra(getString(R.string.SongsIntentDeleteSongs), false);
-        System.out.println("From SongsActivity getExtra('deleteSongs', false) == " + deleteSongsMode);
+        deleteSongsMode = getIntent().getBooleanExtra(getString(R.string.SongsIntentDeleteSongs),
+                false);
+        System.out.println(
+                "From SongsActivity getExtra('deleteSongs', false) == " + deleteSongsMode);
         songDeletedToast = Toast.makeText(this, "Song deleted", Toast.LENGTH_SHORT);
-        notPickedToast = Toast.makeText(this, "Choose mode and difficult!", Toast.LENGTH_LONG);
         songsString = new ArrayList<>();
         sizeCoff = MySurfaceView.myDeviceWidth / getResources().getDisplayMetrics().widthPixels;
         System.out.println("From SongsActivity sizeCoff == " + MySurfaceView.myDeviceWidth
@@ -280,10 +274,7 @@ public class SongsActivity extends Activity {
         btnYes = (Button) findViewById(R.id.btnAgreeDeleteSong);
         btnBack = (Button) findViewById(R.id.btn_back);
         songsImageView = (ImageView) findViewById(R.id.songsImage);
-        // btnStart = (Button) findViewById(R.id.btnStartFromSongs);
         radioGroupDifficulty = (RadioGroup) findViewById(R.id.radioGroupDifficulty);
-        //radioGroupMode = (RadioGroup) findViewById(R.id.radioGroupMode);
-        anim = AnimationUtils.loadAnimation(this, R.anim.anim);
         intentGameActivity = new Intent(SongsActivity.this, GameActivity.class);
         intentMainMenu = new Intent(this, MainMenuActivity.class);
         intentSettingsActivity = new Intent(this, SettingsActivity.class);
@@ -303,35 +294,35 @@ public class SongsActivity extends Activity {
             rlayDeleteSongs.setVisibility(View.VISIBLE);
         }
         listView.setOnItemClickListener(onItemClickListener);
-        mtsk.execute();
+        new CopySongsAsyncTask(this).execute();
         ConstructorActivity.isConstructorActivity = false;
         radioGroupDifficulty.setOnCheckedChangeListener((group, checkedId) -> {
-                switch (checkedId) {
-                    case -1:
-                        break;
-                    case R.id.radioButtonEasy:
-                        difficulty = Game.EASY;
-                        break;
-                    case R.id.radioButtonMedium:
-                        difficulty = Game.MEDIUM;
-                        break;
-                    case R.id.radioButtonHard:
-                        difficulty = Game.HARD;
-                        break;
-                }
-                //btnStart.setBackgroundResource(R.drawable.start_button);
+            switch (checkedId) {
+                case -1:
+                    break;
+                case R.id.radioButtonEasy:
+                    difficulty = Game.EASY;
+                    break;
+                case R.id.radioButtonMedium:
+                    difficulty = Game.MEDIUM;
+                    break;
+                case R.id.radioButtonHard:
+                    difficulty = Game.HARD;
+                    break;
+            }
+            //btnStart.setBackgroundResource(R.drawable.start_button);
                 /*if (mode == 10 || difficulty == 10) {
                     notPickedToast.show();
                 } else {*/
-                if (checkB.isChecked()) {
-                    beginnerMode = true;
-                } else {
-                    beginnerMode = false;
-                }
-                intentGameActivity.putExtra(getString(R.string.GameIntentDifficulty), difficulty);
-                intentGameActivity.putExtra(getString(R.string.GameIntentMode), mode);
-                startActivity(intentGameActivity);
-                rlayStartSong.setVisibility(View.GONE);
+            if (checkB.isChecked()) {
+                beginnerMode = true;
+            } else {
+                beginnerMode = false;
+            }
+            intentGameActivity.putExtra(getString(R.string.GameIntentDifficulty), difficulty);
+            intentGameActivity.putExtra(getString(R.string.GameIntentMode), mode);
+            startActivity(intentGameActivity);
+            rlayStartSong.setVisibility(View.GONE);
 
         });
         /*radioGroupMode.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -444,26 +435,11 @@ public class SongsActivity extends Activity {
         }
     }
 
-	/*public void onClick(View v) {
-        rlayAdd.setVisibility(View.GONE);
-		switch (v.getId()) {
-			case R.id.addFromWeb:
-				btnAddSong.setBackgroundResource(R.drawable.ic_add_song);
-				intentAddSong.setClass(this, WebActivity.class);
-				this.startActivity(intentAddSong);
-				break;
-			case R.id.addFromStorage:
-				btnAddSong.setBackgroundResource(R.drawable.ic_add_song);
-				intentAddSong.setClass(this, FileExplore.class);
-				this.startActivity(intentAddSong);
-				break;
-		}
-	}*/
-
     @Override
     public void onBackPressed() {
         if (!deleteSongsMode) {
-            if (rlayAdd.getVisibility() == View.VISIBLE || rlayStartSong.getVisibility() == View.VISIBLE) {
+            if (rlayAdd.getVisibility() == View.VISIBLE ||
+                    rlayStartSong.getVisibility() == View.VISIBLE) {
                 rlayAdd.setVisibility(View.GONE);
                 rlayStartSong.setVisibility(View.GONE);
                 btnStorage.setBackgroundResource(R.drawable.ic_folder_white_24dp);
@@ -510,6 +486,7 @@ public class SongsActivity extends Activity {
     }
 
     public class LoadSongsFromWebThread extends AsyncTask<String, Void, String> {
+
         Document doc;
         Elements parsedLiList;
 
@@ -554,6 +531,7 @@ public class SongsActivity extends Activity {
     }
 
     public class AddMoreSongFromWeb extends AsyncTask<String, Void, String> {
+
         Document doc;
         Element aNext;
         Elements parsedLiList;
@@ -598,13 +576,21 @@ public class SongsActivity extends Activity {
         }
     }
 
-    class MTSK extends AsyncTask<Void, Void, Void> {
+    static class CopySongsAsyncTask extends AsyncTask<Void, Void, Void> {
+
+        private ProgressDialog pDialog;
+        private ResourcesHelper resourcesHelper;
+        private Drawable progressDrawable;
+
+        CopySongsAsyncTask(Context context) {
+            pDialog = new ProgressDialog(context);
+            resourcesHelper = new ResourcesHelper(context);
+            progressDrawable = context.getResources().getDrawable(R.drawable.progress);
+        }
 
         @Override
         protected void onPreExecute() {
-            pDialog = new ProgressDialog(SongsActivity.this);
-            pDialog.setIndeterminateDrawable(getResources().getDrawable(
-                    R.drawable.progress));
+            pDialog.setIndeterminateDrawable(progressDrawable);
             pDialog.setMessage("Loading all songs... It will never repeat");
             pDialog.setIndeterminate(false);
             pDialog.setCancelable(false);
@@ -614,36 +600,17 @@ public class SongsActivity extends Activity {
 
         @Override
         protected Void doInBackground(Void... arg0) {
-            copySong("how_you_remind_me_nickelback_music_only", getApplicationContext());
-            copySong("how_you_remind_me_nickelback_drums_only", getApplicationContext());
-            copySong("ACDCSatteliteBlues_drums_only", getApplicationContext());
-            copySong("ACDCSatteliteBlues_music_only", getApplicationContext());
-            copySong("EvanescenceBringMeToLife_drums_only", getApplicationContext());
-            copySong("EvanescenceBringMeToLife_music_only", getApplicationContext());
-            copySong("FooFightersLearntoFly_drums_only", getApplicationContext());
-            copySong("FooFightersLearntoFly_music_only", getApplicationContext());
-            copySong("LennyKravitzAreYouGonnaGoMyWay_drums_only", getApplicationContext());
-            copySong("LennyKravitzAreYouGonnaGoMyWay_music_only", getApplicationContext());
-            copySong("IHateEverythingAboutYou_drums_only", getApplicationContext());
-            copySong("IHateEverythingAboutYou_music_only", getApplicationContext());
-            copySong("StockholmSyndrome_drums_only", getApplicationContext());
-            copySong("StockholmSyndrome_music_only", getApplicationContext());
-            copySong("The Who - I Can See for Miles_drums_only",getApplicationContext());
-            copySong("The Who - I Can See for Miles_music_only",getApplicationContext());
-            copySong("Red Hot Chili Peppers - Californication_music_only",getApplicationContext());
-            copySong("Red Hot Chili Peppers - Californication_drums_only",getApplicationContext());
-            copySong("Moby - Porcelain_drums_only",getApplicationContext());
-            copySong("Moby - Porcelain_music_only",getApplicationContext());
-            copySong("Drain_You_1_music_only",getApplicationContext());
-            copySong("Drain_You_1_drums_only",getApplicationContext());
-            copySong("Blur - Song 2_music_only",getApplicationContext());
-            copySong("Blur - Song 2_drums_only",getApplicationContext());
+            resourcesHelper.copySongs();
             return null;
         }
 
         @Override
         protected void onPostExecute(Void result) {
+            resourcesHelper.destroy();
             pDialog.dismiss();
+            pDialog = null;
+            resourcesHelper = null;
+            progressDrawable = null;
             super.onPostExecute(result);
         }
     }

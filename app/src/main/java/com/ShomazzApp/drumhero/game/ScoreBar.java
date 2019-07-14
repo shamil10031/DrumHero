@@ -226,9 +226,9 @@ public class ScoreBar implements IDrawable {
         //		+ multiplier + "x  score = " + this.score);
     }
 
-    public void increaseMultiplier(int factor) {
+    public void increaseMultiplier() {
         if (multiplier < 4) {
-            this.multiplier += factor;
+            this.multiplier ++;
             //	Log.v("SCORE", "increaseMultiplier (" + factor + ") multiplier = "
             //		+ multiplier + "x");
         }

@@ -3,31 +3,26 @@ package com.ShomazzApp.drumhero.game;
 import android.graphics.Canvas;
 import android.graphics.RectF;
 
+import com.ShomazzApp.drumhero.utils.Constants;
 import com.ShomazzApp.drumhero.utils.MySurfaceView;
 
 public class Note implements IUpdatable, IDrawable {
 
     public boolean isDead = false;
-    public static final int maxWidthNoTappers = 280;
-    public static final int maxHeightNoTappers = 133;
-    public static final int maxWidthDefault = 170;
-    public static final int maxHeightDefault = 80;
     private int maxWidth;
     private int maxHeight;
-    public static final int minWidthNoTappers = 74;
-    public static final int minHeightNoTappers = 34;
-    public static final int minWidthDefault = 90;
-    public static final int minHeightDefault = 35;
     private int minWidth;
     private int minHeight;
     private int currentWidth;
     private int currentHeight;
     private float widthCoff;
     private float heightCoff;
+
     private static final float widthCoffNoTappers = 0.160f;
     private static final float heightCoffNoTappers = 0.080f;
     private static final float widthCoffDefault = 0.10f;
     private static final float heightCoffDefault = 0.06f;
+
     private static final float speedCoffInc = 0.0002f;
     public static final float startSpeedCoffY = 0.32f;
     private float currenSpeedCoffY;
@@ -37,78 +32,76 @@ public class Note implements IUpdatable, IDrawable {
     private RectF noteRect;
     private float x, y = -minHeight;
     private int numberOfLine;
-    private boolean noTappersMode;
 
     public Note(int numberOfLine, int startSecond, Game game) {
-
         this.game = game;
         this.startSecond = startSecond;
         this.numberOfLine = numberOfLine;
-        if(game != null) {
-            this.noTappersMode = game.noTappersMode;
-        }
+        setupSizes(game.noTappersMode);
+    }
 
-        if (!noTappersMode) {
-            minWidth = minWidthDefault;
-            minHeight = minHeightDefault;
-            widthCoff = widthCoffDefault;
-            heightCoff = heightCoffDefault;
-            maxHeight = maxHeightDefault;
-            maxWidth = maxWidthDefault;
-            switch (numberOfLine) {
-                case 1:
-                    x = 800f;
-                    speedCoffX = -0.083f;
-                    break;
-                case 2:
-                    x = 910f;
-                    speedCoffX = -0.033f;
-                    break;
-                case 3:
-                    x = 1005f;
-                    speedCoffX = 0.03f;
-                    break;
-                case 4:
-                    x = 1110f;
-                    speedCoffX = 0.0835f;
-                    break;
-            }
+    private void setupSizes(boolean isNoTappersMode) {
+        if (isNoTappersMode) {
+            setupNoTappersModeSizes();
         } else {
-            minWidth = minWidthNoTappers;
-            minHeight = minHeightNoTappers;
-            widthCoff = widthCoffNoTappers;
-            heightCoff = heightCoffNoTappers;
-            maxHeight = maxHeightNoTappers;
-            maxWidth = maxWidthNoTappers;
-            switch (numberOfLine) {
-                case 1:
-                    x = 815f;
-                    speedCoffX = -0.175f;
-                    break;
-                case 2:
-                    x = 910f;
-                    speedCoffX = -0.048f;
-                    break;
-                case 3:
-                    x = 1015f;
-                    speedCoffX = 0.055f;
-                    break;
-                case 4:
-                    x = 1110f;
-                    speedCoffX = 0.185f;
-                    break;
-            }
+            setupDefaultModeSizes();
         }
         currentHeight = minHeight;
         currentWidth = minWidth;
         currenSpeedCoffY = startSpeedCoffY;
     }
 
-    public static int getNoteHeight(boolean noTappersMode) {
-        if (noTappersMode) {
-            return maxHeightNoTappers;
-        } else {
-            return maxHeightDefault;
+    private void setupNoTappersModeSizes() {
+        minWidth = Constants.NoTappersMode.NOTE_MIN_WIDTH;
+        minHeight = Constants.NoTappersMode.NOTE_MIN_HEIGHT;
+        maxHeight = Constants.NoTappersMode.NOTE_MAX_HEIGHT;
+        maxWidth = Constants.NoTappersMode.NOTE_MIN_WIDTH;
+        widthCoff = widthCoffNoTappers;
+        heightCoff = heightCoffNoTappers;
+        switch (numberOfLine) {
+            case 1:
+                x = 815f;
+                speedCoffX = -0.175f;
+                break;
+            case 2:
+                x = 910f;
+                speedCoffX = -0.048f;
+                break;
+            case 3:
+                x = 1015f;
+                speedCoffX = 0.055f;
+                break;
+            case 4:
+                x = 1110f;
+                speedCoffX = 0.185f;
+                break;
+        }
+    }
+
+    private void setupDefaultModeSizes() {
+        minWidth = Constants.TappersMode.NOTE_MIN_WIDTH;
+        minHeight = Constants.TappersMode.NOTE_MIN_HEIGHT;
+        maxHeight = Constants.TappersMode.NOTE_MAX_HEIGHT;
+        maxWidth = Constants.TappersMode.NOTE_MIN_WIDTH;
+        widthCoff = widthCoffDefault;
+        heightCoff = heightCoffDefault;
+        switch (numberOfLine) {
+            case 1:
+                x = 800f;
+                speedCoffX = -0.083f;
+                break;
+            case 2:
+                x = 910f;
+                speedCoffX = -0.033f;
+                break;
+            case 3:
+                x = 1005f;
+                speedCoffX = 0.03f;
+                break;
+            case 4:
+                x = 1110f;
+                speedCoffX = 0.0835f;
+                break;
         }
     }
 
@@ -118,8 +111,12 @@ public class Note implements IUpdatable, IDrawable {
             currenSpeedCoffY += deltatime * speedCoffInc;
             y += deltatime * currenSpeedCoffY;
             x += deltatime * speedCoffX;
-            if (currentHeight < maxHeight) currentHeight += deltatime * heightCoff;
-            if (currentWidth < maxWidth) currentWidth += deltatime * widthCoff;
+            if (currentHeight < maxHeight) {
+                currentHeight += deltatime * heightCoff;
+            }
+            if (currentWidth < maxWidth) {
+                currentWidth += deltatime * widthCoff;
+            }
             if (y > DestroyLine.getDestroyLineY(game.noTappersMode) + 2 * maxHeight) {
                 game.destroyNote(this, false);
             }
@@ -150,22 +147,27 @@ public class Note implements IUpdatable, IDrawable {
         }
     }
 
-    public void onDestroy() {
-        y = -maxHeight;
-        isDead = true;
-        game.addExplosion(this);
+    public static int getNoteHeight(boolean noTappersMode) {
+        if (noTappersMode) {
+            return Constants.NoTappersMode.NOTE_MAX_HEIGHT;
+        } else {
+            return Constants.TappersMode.NOTE_MAX_HEIGHT;
+        }
     }
 
     public static int getNoteWidth(boolean noTappersMode) {
         if (noTappersMode) {
-            return maxWidthNoTappers;
+            return Constants.NoTappersMode.NOTE_MAX_WIDTH;
         } else {
-            return maxWidthDefault;
+            return Constants.TappersMode.NOTE_MAX_WIDTH;
         }
     }
 
-    public float getNoteX() {
-        return x;
+    public void onDestroy() {
+        y = -maxHeight;
+        isDead = true;
+        game.addExplosion(this);
+        game = null;
     }
 
     public float getNoteY() {
@@ -183,7 +185,7 @@ public class Note implements IUpdatable, IDrawable {
     @Override
     public boolean equals(Object o) {
         boolean b = false;
-        if (o.getClass() == this.getClass()) {
+        if (o != null && o.getClass() == this.getClass()) {
             Note note = (Note) o;
             if (this.getStartSecond() == note.getStartSecond()
                     && this.getNumberOfLine() == note.getNumberOfLine()) {

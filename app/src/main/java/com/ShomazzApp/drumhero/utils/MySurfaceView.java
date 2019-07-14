@@ -2,7 +2,6 @@ package com.ShomazzApp.drumhero.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -24,10 +23,9 @@ public class MySurfaceView extends SurfaceView implements
     public static final float myDeviceWidth = 1920.0f;
     public static float sizeHeightCoff = 0;
     public static float sizeWidthCoff = 0;
-    private static Context context;
     private static Paint paint;
-    private static Bitmap background;
-    private Motor motorDraw;
+    private Bitmap background;
+    private MotorDraw motorDraw;
     private MotorUpdate motorUpdate;
     private Canvas canvas;
     private Game game;
@@ -36,14 +34,14 @@ public class MySurfaceView extends SurfaceView implements
     public MySurfaceView(Context context) {
         super(context);
         getHolder().addCallback(this);
-        setup(context);
+        setup();
         Log.d(LOG, "Constructor method called");
     }
 
     public MySurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
         getHolder().addCallback(this);
-        setup(context);
+        setup();
         Log.d(LOG, "Constructor method called");
     }
 
@@ -55,28 +53,13 @@ public class MySurfaceView extends SurfaceView implements
         canvas.drawBitmap(bitmap, m, paint);
     }
 
-    public static Bitmap getBitmap(String name) {
-        int id = context.getResources().getIdentifier(name, null,
-                context.getPackageName());
-        Bitmap bitmap = BitmapFactory
-                .decodeResource(context.getResources(), id);
-        return bitmap;
-    }
-
-    public SurfaceHolder getSurfaceHolder() {
-        return surHolder;
-    }
-
-    public void setup(Context context) {
-        this.game = null;
-        this.context = context;
+    public void setup() {
         this.paint = new Paint();
         Log.d(LOG, "Setup() called");
     }
 
     @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width,
-                               int height) {
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
         Log.d(LOG, "SurfaceChanged() called");
     }
 
@@ -86,20 +69,23 @@ public class MySurfaceView extends SurfaceView implements
             sizeHeightCoff = myDeviceHeight / holder.getSurfaceFrame().bottom;
             sizeWidthCoff = myDeviceWidth / holder.getSurfaceFrame().right;
         }
-        surHolder = holder;
-        Bitmap d = Game.background;
-        float scale = (float) d.getWidth() / (float) getWidth();
-        int newWidth = Math.round(d.getWidth() / scale);
-        int newHeight = Math.round(d.getHeight() / scale);
-        background = Bitmap.createScaledBitmap(d, newWidth, newHeight, true);
-        motorDraw = new Motor();
+        motorDraw = new MotorDraw();
         motorUpdate = new MotorUpdate();
-        startGame();
+        //startGame
         this.setOnTouchListener(game);
         Log.d(LOG, "SurfaceCreated() called");
     }
 
-    private void startGame() {
+    public Bitmap createScaledBackgroundBitmap(){
+        Bitmap background = Game.background;
+        float scale = (float) background.getWidth() / (float) getWidth();
+        int newWidth = Math.round(background.getWidth() / scale);
+        int newHeight = Math.round(background.getHeight() / scale);
+        return Bitmap.createScaledBitmap(background, newWidth, newHeight, true);
+    }
+
+    public void startGame() {
+        background = createScaledBackgroundBitmap();
         game.start();
         motorUpdate.start();
         motorDraw.start();
@@ -110,7 +96,7 @@ public class MySurfaceView extends SurfaceView implements
         try {
             motorUpdate.turnOff();
             motorDraw.turnOff();
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         game.onDestroy();
@@ -119,8 +105,9 @@ public class MySurfaceView extends SurfaceView implements
     }
 
     public void update() {
-        if (game != null)
+        if (game != null && !game.gameEnded) {
             game.update();
+        }
     }
 
     public Game getGame() {
@@ -136,8 +123,9 @@ public class MySurfaceView extends SurfaceView implements
         private boolean isRunning = true;
 
         public void run() {
-            while (isRunning)
+            while (isRunning) {
                 update();
+            }
         }
 
         public void turnOff() {
@@ -146,22 +134,24 @@ public class MySurfaceView extends SurfaceView implements
 
     }
 
-    class Motor extends Thread {
+    class MotorDraw extends Thread {
+
         SurfaceHolder holder = getHolder();
         boolean isRunning = true;
 
         @Override
         public synchronized void start() {
             super.start();
-            Log.d(LOG, "Motor start() called");
+            Log.d(LOG, "MotorDraw start() called");
         }
 
         public void turnOff() {
             isRunning = false;
         }
 
+        @Override
         public void run() {
-            Log.d(LOG, "Motor run() called");
+            Log.d(LOG, "MotorDraw run() called");
             while (isRunning) {
                 canvas = holder.lockCanvas();
                 if (canvas != null) {
@@ -174,10 +164,11 @@ public class MySurfaceView extends SurfaceView implements
         }
 
         protected void draw(Canvas canvas) {
-            if (game != null) {
+            if (game != null && !game.gameEnded) {
                 game.draw(canvas);
-            } else
+            } else {
                 canvas.drawColor(Color.CYAN);
+            }
         }
     }
 }

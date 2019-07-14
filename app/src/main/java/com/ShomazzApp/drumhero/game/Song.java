@@ -8,8 +8,7 @@ public class Song {
     private String fileName;
     private int id;
 
-    public Song(String name, String artist, String tableName, String fileName,
-                int id) {
+    public Song(String name, String artist, String tableName, String fileName, int id) {
         this.name = toStringForSQL(name);
         this.id = id;
         this.artist = artist;
@@ -33,15 +32,15 @@ public class Song {
 
     //A–Z, a–z, 0–9, _ (подчеркивание), $ и #
 
-    public static String toStringForSQL(String w){
+    public static String toStringForSQL(String w) {
         String word = "";
-        for (int i = 0; i < w.length(); i++){
+        for (int i = 0; i < w.length(); i++) {
             if ((w.charAt(i) >= 'A' && w.charAt(i) <= 'Z')
                     || (w.charAt(i) >= 'a' && w.charAt(i) <= 'z')
                     || (w.charAt(i) >= '0' && w.charAt(i) <= '9')
                     || w.charAt(i) == '_' || w.charAt(i) == '$'
-                    || w.charAt(i) =='#' || w.charAt(i) == ' '){
-                if(w.charAt(i) == '_'){
+                    || w.charAt(i) == '#' || w.charAt(i) == ' ') {
+                if (w.charAt(i) == '_') {
                     word += ' ';
                 } else {
                     word += w.charAt(i);
@@ -63,7 +62,9 @@ public class Song {
         System.out.println("From makeFileNameOfPath path == " + path + "\n"
                 + "addedWord == " + addedWord + "\n"
                 + "return word == " + word.replace(".mid", addedWord));
-        if (!word.endsWith(".mid")) word += ".mid";
+        if (!word.endsWith(".mid")) {
+            word += ".mid";
+        }
         return word.replace(".mid", addedWord);
     }
 
@@ -96,7 +97,7 @@ public class Song {
         this.tableName = s;
     }
 
-    public void setFileName (String s) {
+    public void setFileName(String s) {
         this.fileName = s;
     }
 

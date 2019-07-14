@@ -19,6 +19,7 @@ import com.ShomazzApp.drumhero.R;
 import com.ShomazzApp.drumhero.SongsActivity;
 import com.ShomazzApp.drumhero.utils.DBManager;
 import com.ShomazzApp.drumhero.utils.MySurfaceView;
+import com.ShomazzApp.drumhero.utils.ResourcesHelper;
 
 import java.util.ArrayList;
 
@@ -34,7 +35,7 @@ public class Game implements OnTouchListener {
     private static final float widthOfBtn = 160;
     private static final float XofBtn = 1715;
     private static final float YofBtn = 28;
-    public static String LOG = "Surface";
+    public String LOG = "Surface";
     public static Bitmap background;
     public static Bitmap btn;
     public static Bitmap btnPause;
@@ -77,14 +78,14 @@ public class Game implements OnTouchListener {
     public static Bitmap scoreIndicator10;
     public static Bitmap scoreIndicator11;
     public static Bitmap scoreIndicator12;
-    public static Bitmap[] explosion = new Bitmap[4];
+    public static Bitmap[] explosion;
     private static RectF stopButtonRect;
     private static String titleByName;
     private static String tableName;
     private static String filePath;
     private static int difficulty;
     private static int mode;
-    private static ArrayList<Object> trashCan = new ArrayList<>();
+    private ArrayList<Object> trashCan = new ArrayList<>();
     public boolean noTappersMode;
     public boolean gameEnded = false;
     public boolean gameStarted = false;
@@ -93,13 +94,12 @@ public class Game implements OnTouchListener {
     private Activity activity;
     private MediaPlayer mpDrumsOnly;
     private MediaPlayer mpMusicOnly;
-    private MediaPlayer mpAllMusic;
     private DBManager db;
     private ScoreBar scoreBar;
-    private CleanThread delNotesThread;
+    private CleanThread cleanThread;
     private Intent intentGameEnded;
-    private ArrayList<Note> notes = new ArrayList<>();
-    private ArrayList<Note> notesClone = new ArrayList<>();
+    private ArrayList<Note> notes;
+    private ArrayList<Note> notesClone;
     private ArrayList<Explosion> explosions = new ArrayList<>();
     private ArrayList<DestroyLine> destroyLines = new ArrayList<>();
     private ArrayList<DestroyTapper> destroyTappers = new ArrayList<>();
@@ -111,8 +111,19 @@ public class Game implements OnTouchListener {
     private int duration;
     private int i = 0;
 
-    public Game(Activity activity, String filePath,
-                String tableName, String titleByName, int difficulty, int mode, boolean noTappersMode) {
+    public void destroy() {
+        activity = null;
+        clearBitmaps();
+    }
+
+    public Game(Activity activity,
+            String filePath,
+            String tableName,
+            String titleByName,
+            int difficulty,
+            int mode,
+            boolean noTappersMode
+    ) {
         if (filePath != null && tableName != null && titleByName != null) {
             this.titleByName = titleByName;
             this.tableName = tableName;
@@ -123,81 +134,122 @@ public class Game implements OnTouchListener {
         System.out.println("From Game mode == " + mode);
         this.activity = activity;
         this.noTappersMode = noTappersMode;
-        notes = new ArrayList<>();
         notesClone = new ArrayList<>();
         intentGameEnded = new Intent(activity, GameEndedActivity.class);
         isMidi = createMediaPlayers(this.filePath);
-        delNotesThread = new CleanThread();
+        cleanThread = new CleanThread();
         scoreBar = new ScoreBar(this, SongsActivity.beginnerMode);
         for (int i = 0; i < 4; i++) {
             destroyLines.add(new DestroyLine(i + 1, this));
-            if (!noTappersMode)
+            if (!noTappersMode) {
                 destroyTappers.add(new DestroyTapper(i + 1));
+            }
         }
         db = new DBManager(activity.getApplicationContext(), this);
         notes = db.getNotesWithDifficulty(tableName, false, this.difficulty);
         System.out.println("From game notes.size() == " + notes.size());
-        loadBitmaps();
-        btn = btnPause;
     }
 
-    public static void removeObject(Object obj) {
+    public void removeObject(Object obj) {
         trashCan.add(obj);
     }
 
-    private void loadBitmaps() {
+    public void loadBitmaps() {
+        ResourcesHelper resourcesHelper = new ResourcesHelper(activity);
         background = noTappersMode ?
-                MySurfaceView.getBitmap("drawable/game_background_no_tappers") :
-                MySurfaceView.getBitmap("drawable/game_background");
-        scoreIndicator0 = MySurfaceView.getBitmap("drawable/score_indicator_0");
-        scoreIndicator1 = MySurfaceView.getBitmap("drawable/score_indicator_1");
-        scoreIndicator2 = MySurfaceView.getBitmap("drawable/score_indicator_2");
-        scoreIndicator3 = MySurfaceView.getBitmap("drawable/score_indicator_3");
-        scoreIndicator4 = MySurfaceView.getBitmap("drawable/score_indicator_4");
-        scoreIndicator5 = MySurfaceView.getBitmap("drawable/score_indicator_5");
-        scoreIndicator6 = MySurfaceView.getBitmap("drawable/score_indicator_6");
-        scoreIndicator7 = MySurfaceView.getBitmap("drawable/score_indicator_7");
-        scoreIndicator8 = MySurfaceView.getBitmap("drawable/score_indicator_8");
-        scoreIndicator9 = MySurfaceView.getBitmap("drawable/score_indicator_9");
-        scoreIndicator10 = MySurfaceView
-                .getBitmap("drawable/score_indicator_10");
-        scoreIndicator11 = MySurfaceView
-                .getBitmap("drawable/score_indicator_11");
-        scoreIndicator12 = MySurfaceView
-                .getBitmap("drawable/score_indicator_12");
-        desTapperRed = MySurfaceView.getBitmap("drawable/red_destapper");
-        desTapperGreen = MySurfaceView.getBitmap("drawable/green_destapper");
-        desTapperYellow = MySurfaceView.getBitmap("drawable/yellow_destapper");
-        desTapperBlue = MySurfaceView.getBitmap("drawable/blue_destapper");
-        noteBlue = MySurfaceView.getBitmap("drawable/blue_note");
-        noteRed = MySurfaceView.getBitmap("drawable/red_note");
-        noteGreen = MySurfaceView.getBitmap("drawable/green_note");
-        noteYellow = MySurfaceView.getBitmap("drawable/yellow_note");
-        crash1Blue = MySurfaceView.getBitmap("drawable/blue_crash1");
-        crash1Red = MySurfaceView.getBitmap("drawable/red_crash1");
-        crash1Green = MySurfaceView.getBitmap("drawable/green_crash1");
-        crash1Yellow = MySurfaceView.getBitmap("drawable/yellow_crash1");
-        crash2Red = MySurfaceView.getBitmap("drawable/red_crash2");
-        crash2Green = MySurfaceView.getBitmap("drawable/green_crash2");
-        crash2Yellow = MySurfaceView.getBitmap("drawable/yellow_crash2");
-        crash2Blue = MySurfaceView.getBitmap("drawable/blue_crash2");
-        desLineRed = MySurfaceView.getBitmap("drawable/red_desline");
-        touchedDesLineRed = MySurfaceView.getBitmap("drawable/red_desline2");
-        desLineGreen = MySurfaceView.getBitmap("drawable/green_desline");
-        touchedDesLineGreen = MySurfaceView
-                .getBitmap("drawable/green_desline2");
-        desLineYellow = MySurfaceView.getBitmap("drawable/yellow_desline");
-        touchedDesLineYellow = MySurfaceView
-                .getBitmap("drawable/yellow_desline2");
-        desLineBlue = MySurfaceView.getBitmap("drawable/blue_desline");
-        touchedDesLineBlue = MySurfaceView.getBitmap("drawable/blue_desline2");
-        scoreBarBitmap = MySurfaceView.getBitmap("drawable/score_bar");
-        btnPause = MySurfaceView.getBitmap("drawable/stop_button");
-        btnPauseHolded = MySurfaceView.getBitmap("drawable/stop_button_holded");
-        explosion[0] = MySurfaceView.getBitmap("drawable/starred");
-        explosion[1] = MySurfaceView.getBitmap("drawable/stargreen");
-        explosion[2] = MySurfaceView.getBitmap("drawable/staryellow");
-        explosion[3] = MySurfaceView.getBitmap("drawable/starblue");
+                resourcesHelper.getBitmap("drawable/game_background_no_tappers") :
+                resourcesHelper.getBitmap("drawable/game_background");
+        scoreIndicator0 = resourcesHelper.getBitmap("drawable/score_indicator_0");
+        scoreIndicator1 = resourcesHelper.getBitmap("drawable/score_indicator_1");
+        scoreIndicator2 = resourcesHelper.getBitmap("drawable/score_indicator_2");
+        scoreIndicator3 = resourcesHelper.getBitmap("drawable/score_indicator_3");
+        scoreIndicator4 = resourcesHelper.getBitmap("drawable/score_indicator_4");
+        scoreIndicator5 = resourcesHelper.getBitmap("drawable/score_indicator_5");
+        scoreIndicator6 = resourcesHelper.getBitmap("drawable/score_indicator_6");
+        scoreIndicator7 = resourcesHelper.getBitmap("drawable/score_indicator_7");
+        scoreIndicator8 = resourcesHelper.getBitmap("drawable/score_indicator_8");
+        scoreIndicator9 = resourcesHelper.getBitmap("drawable/score_indicator_9");
+        scoreIndicator10 = resourcesHelper.getBitmap("drawable/score_indicator_10");
+        scoreIndicator11 = resourcesHelper.getBitmap("drawable/score_indicator_11");
+        scoreIndicator12 = resourcesHelper.getBitmap("drawable/score_indicator_12");
+        noteRed = resourcesHelper.getBitmap("drawable/red_note");
+        noteBlue = resourcesHelper.getBitmap("drawable/blue_note");
+        noteGreen = resourcesHelper.getBitmap("drawable/green_note");
+        crash1Red = resourcesHelper.getBitmap("drawable/red_crash1");
+        crash2Red = resourcesHelper.getBitmap("drawable/red_crash2");
+        noteYellow = resourcesHelper.getBitmap("drawable/yellow_note");
+        crash1Blue = resourcesHelper.getBitmap("drawable/blue_crash1");
+        crash2Blue = resourcesHelper.getBitmap("drawable/blue_crash2");
+        desLineRed = resourcesHelper.getBitmap("drawable/red_desline");
+        crash2Green = resourcesHelper.getBitmap("drawable/green_crash2");
+        crash1Green = resourcesHelper.getBitmap("drawable/green_crash1");
+        desLineBlue = resourcesHelper.getBitmap("drawable/blue_desline");
+        crash1Yellow = resourcesHelper.getBitmap("drawable/yellow_crash1");
+        desLineGreen = resourcesHelper.getBitmap("drawable/green_desline");
+        desTapperRed = resourcesHelper.getBitmap("drawable/red_destapper");
+        crash2Yellow = resourcesHelper.getBitmap("drawable/yellow_crash2");
+        desTapperBlue = resourcesHelper.getBitmap("drawable/blue_destapper");
+        desLineYellow = resourcesHelper.getBitmap("drawable/yellow_desline");
+        scoreBarBitmap = resourcesHelper.getBitmap("drawable/score_bar");
+        btn = btnPause = resourcesHelper.getBitmap("drawable/stop_button");
+        btnPauseHolded = resourcesHelper.getBitmap("drawable/stop_button_holded");
+        desTapperGreen = resourcesHelper.getBitmap("drawable/green_destapper");
+        desTapperYellow = resourcesHelper.getBitmap("drawable/yellow_destapper");
+        touchedDesLineRed = resourcesHelper.getBitmap("drawable/red_desline2");
+        touchedDesLineBlue = resourcesHelper.getBitmap("drawable/blue_desline2");
+        touchedDesLineGreen = resourcesHelper.getBitmap("drawable/green_desline2");
+        touchedDesLineYellow = resourcesHelper.getBitmap("drawable/yellow_desline2");
+        explosion = new Bitmap[4];
+        explosion[0] = resourcesHelper.getBitmap("drawable/starred");
+        explosion[1] = resourcesHelper.getBitmap("drawable/stargreen");
+        explosion[2] = resourcesHelper.getBitmap("drawable/staryellow");
+        explosion[3] = resourcesHelper.getBitmap("drawable/starblue");
+    }
+
+    public void clearBitmaps() {
+        background = null;
+        btn = null;
+        btnPause = null;
+        btnPauseHolded = null;
+        scoreBarBitmap = null;
+        desTapperRed = null;
+        desTapperGreen = null;
+        desTapperYellow = null;
+        desTapperBlue = null;
+        crash1Red = null;
+        crash2Red = null;
+        noteRed = null;
+        crash1Green = null;
+        crash2Green = null;
+        noteGreen = null;
+        crash1Yellow = null;
+        crash2Yellow = null;
+        noteYellow = null;
+        crash1Blue = null;
+        crash2Blue = null;
+        noteBlue = null;
+        desLineRed = null;
+        touchedDesLineRed = null;
+        desLineGreen = null;
+        touchedDesLineGreen = null;
+        desLineYellow = null;
+        touchedDesLineYellow = null;
+        desLineBlue = null;
+        touchedDesLineBlue = null;
+        scoreIndicator0 = null;
+        scoreIndicator1 = null;
+        scoreIndicator2 = null;
+        scoreIndicator3 = null;
+        scoreIndicator4 = null;
+        scoreIndicator5 = null;
+        scoreIndicator6 = null;
+        scoreIndicator7 = null;
+        scoreIndicator8 = null;
+        scoreIndicator9 = null;
+        scoreIndicator10 = null;
+        scoreIndicator11 = null;
+        scoreIndicator12 = null;
+        explosion = null;
     }
 
     @Override
@@ -224,7 +276,8 @@ public class Game implements OnTouchListener {
                             }
                         }
                     }
-                    if (event.getX(index) > stopButtonRect.left && event.getY(index) > stopButtonRect.top
+                    if (event.getX(index) > stopButtonRect.left && event.getY(index) >
+                            stopButtonRect.top
                             && event.getX(index) < stopButtonRect.right
                             && event.getY(index) < stopButtonRect.bottom) {
                         btn = btnPauseHolded;
@@ -234,8 +287,10 @@ public class Game implements OnTouchListener {
                     if (!noTappersMode) {
                         for (int i = 0; i < destroyTappers.size(); i++) {
                             if (destroyTappers.get(i).isHolded()
-                                    && (event.getY() <= destroyTappers.get(i).getMainY() - destroyTappers.get(i).getHeight()
-                                    || event.getY() >= destroyTappers.get(i).getMainY() + destroyTappers.get(i).getHeight())) {
+                                    && (event.getY() <= destroyTappers.get(i).getMainY() -
+                                    destroyTappers.get(i).getHeight()
+                                    || event.getY() >= destroyTappers.get(i).getMainY() +
+                                    destroyTappers.get(i).getHeight())) {
                                 destroyLines.get(i).onTouchUp();
                                 destroyTappers.get(i).onTouchUp();
                             }
@@ -244,7 +299,8 @@ public class Game implements OnTouchListener {
                         for (int i = 0; i < destroyLines.size(); i++) {
                             if (destroyLines.get(i).isHolded()
                                     && (event.getY() <= destroyLines.get(i).getY()
-                                    || event.getY() >= destroyLines.get(i).getY() + destroyLines.get(i).getHeight())) {
+                                    || event.getY() >= destroyLines.get(i).getY() +
+                                    destroyLines.get(i).getHeight())) {
                                 destroyLines.get(i).onTouchUp();
                             }
                         }
@@ -268,7 +324,8 @@ public class Game implements OnTouchListener {
                             }
                         }
                     }
-                    if (event.getX(index) > stopButtonRect.left && event.getY(index) > stopButtonRect.top
+                    if (event.getX(index) > stopButtonRect.left && event.getY(index) >
+                            stopButtonRect.top
                             && event.getX(index) < stopButtonRect.right
                             && event.getY(index) < stopButtonRect.bottom) {
                         btn = btnPause;
@@ -290,36 +347,34 @@ public class Game implements OnTouchListener {
         if (mode != ONLYMUSIC) {
             scoreBar.draw(canvas);
         }
-        stopButtonRect = new RectF(XofBtn / MySurfaceView.sizeWidthCoff, YofBtn / MySurfaceView.sizeHeightCoff,
+        stopButtonRect = new RectF(XofBtn / MySurfaceView.sizeWidthCoff,
+                YofBtn / MySurfaceView.sizeHeightCoff,
                 (XofBtn + widthOfBtn) / MySurfaceView.sizeWidthCoff, (YofBtn + heightOfBtn)
                 / MySurfaceView.sizeHeightCoff);
         MySurfaceView.drawImage(btn, stopButtonRect, canvas);
     }
 
-    public void  update() {
+    public void update() {
         if (playing) {
             if (notes.size() > i
                     && notes.get(i).getNoteY() <= DestroyLine.getDestroyLineY(noTappersMode)) {
                 currentSecond = System.currentTimeMillis() - startSongSecond;
                 if (!gameStarted &&
-                        //notes.get(0).getNoteY() - Note.getNoteHeight(noTappersMode) / 2 >= DestroyLine.getDestroyLineY(noTappersMode)
-                        notes.get(0).getNoteY() - Note.getNoteHeight(noTappersMode) / 2 >= DestroyLine.getDestroyLineY(noTappersMode)
-                        ) {
-                    if (isMidi) {
-                        switch (mode) {
-                            case ONLYDRUMS:
-                                mpDrumsOnly.start();
-                                break;
-                            case ONLYMUSIC:
-                                mpMusicOnly.start();
-                                break;
-                            case GAME:
-                                mpMusicOnly.start();
-                                mpDrumsOnly.start();
-                                break;
-                        }
-                    } else {
-                        mpAllMusic.start();
+                        //notes.get(0).getNoteY() - Note.getNoteHeight(isNoTappersMode) / 2 >= DestroyLine.getDestroyLineY(isNoTappersMode)
+                        notes.get(0).getNoteY() - Note.getNoteHeight(noTappersMode) / 2 >=
+                                DestroyLine.getDestroyLineY(noTappersMode)
+                ) {
+                    switch (mode) {
+                        case ONLYDRUMS:
+                            mpDrumsOnly.start();
+                            break;
+                        case ONLYMUSIC:
+                            mpMusicOnly.start();
+                            break;
+                        case GAME:
+                            mpMusicOnly.start();
+                            mpDrumsOnly.start();
+                            break;
                     }
                     gameStarted = true;
                 }
@@ -329,75 +384,73 @@ public class Game implements OnTouchListener {
                     i++;
                 }
             }
-            if (lastTime == -1)
+            if (lastTime == -1) {
                 lastTime = System.currentTimeMillis();
+            }
             deltaTime = System.currentTimeMillis() - lastTime;
             if (deltaTime > 0) {
                 lastTime = System.currentTimeMillis();
                 updateAllNotes(notesClone, deltaTime);
                 updateAllArray(explosions);
             }
-            if (gameStarted)
-                delNotesThread.run();
             // GAME ENDS
             if (gameStarted
                     && System.currentTimeMillis() - startSongSecond >= duration + 1500) {
                 playing = false;
-                setGameEnded();
                 onGameEnded(true);
             }
         }
     }
 
     public boolean createMediaPlayers(String filePath) {
-        if (true) { // modes
-            isMidi = true;
-            mpMusicOnly = MediaPlayer.create(activity, Uri.parse(Environment.getExternalStorageDirectory()
-                    .getPath() + ConstructorActivity.MUSICFOLDER + "/"
-                    + Song.makeFileNameOfPath(filePath, ConstructorActivity.musicOnlyString)));
-            mpDrumsOnly = MediaPlayer.create(activity, Uri.parse(Environment.getExternalStorageDirectory()
-                    .getPath() + ConstructorActivity.MUSICFOLDER + "/"
-                    + Song.makeFileNameOfPath(filePath, ConstructorActivity.drumsOnlyString)));
-            switch (mode) {
-                case GAME:
-                    try {
-                        mpMusicOnly.prepare();
-                        mpDrumsOnly.prepare();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    if (mpDrumsOnly.getDuration() > mpMusicOnly.getDuration()) {
-                        duration = mpDrumsOnly.getDuration();
-                        System.out.println("From Game mpDrumsOnly.getDuration() == " + mpDrumsOnly.getDuration());
-                    } else {
-                        duration = mpMusicOnly.getDuration();
-                        System.out.println("From Game mpMusicOnly.getDuration() == " + mpMusicOnly.getDuration());
-                    }
-                    break;
-                case ONLYDRUMS:
+        isMidi = true;
+        mpMusicOnly = MediaPlayer.create(activity,
+                Uri.parse(Environment.getExternalStorageDirectory()
+                        .getPath() + ConstructorActivity.MUSICFOLDER + "/"
+                        + Song.makeFileNameOfPath(filePath,
+                        ConstructorActivity.musicOnlyString)));
+        mpDrumsOnly = MediaPlayer.create(activity,
+                Uri.parse(Environment.getExternalStorageDirectory()
+                        .getPath() + ConstructorActivity.MUSICFOLDER + "/"
+                        + Song.makeFileNameOfPath(filePath,
+                        ConstructorActivity.drumsOnlyString)));
+        switch (mode) {
+            case GAME:
+                try {
+                    mpMusicOnly.prepare();
+                    mpDrumsOnly.prepare();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                if (mpDrumsOnly.getDuration() > mpMusicOnly.getDuration()) {
                     duration = mpDrumsOnly.getDuration();
-                    try {
-                        mpDrumsOnly.prepare();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    break;
-                case ONLYMUSIC:
+                    System.out.println("From Game mpDrumsOnly.getDuration() == " +
+                            mpDrumsOnly.getDuration());
+                } else {
                     duration = mpMusicOnly.getDuration();
-                    try {
-                        mpMusicOnly.prepare();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    break;
-            }
-            mpDrumsOnly.setVolume(1.1f, 1.1f);
-            mpMusicOnly.setVolume(0.9f, 0.9f);
-        } else {
-            mpAllMusic = MediaPlayer.create(activity, Uri.parse(filePath));
-            System.out.println("From Game MediaPlayer allMusic path == " + filePath);
-            duration = mpAllMusic.getDuration();
+                    System.out.println("From Game mpMusicOnly.getDuration() == " +
+                            mpMusicOnly.getDuration());
+                }
+                break;
+            case ONLYDRUMS:
+                duration = mpDrumsOnly.getDuration();
+                try {
+                    mpDrumsOnly.prepare();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
+            case ONLYMUSIC:
+                duration = mpMusicOnly.getDuration();
+                try {
+                    mpMusicOnly.prepare();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
         }
+        mpDrumsOnly.setVolume(1.1f, 1.1f);
+        mpMusicOnly.setVolume(0.9f, 0.9f);
         return isMidi;
     }
 
@@ -426,15 +479,18 @@ public class Game implements OnTouchListener {
     }
 
     public void updateAllNotes(ArrayList<Note> arr, long deltaTime) {
-        for (int i = 0; i < arr.size(); i++)
-            if (arr.get(i) != null && arr.get(i) instanceof IUpdatable)
+        for (int i = 0; i < arr.size(); i++) {
+            if (arr.get(i) != null && arr.get(i) instanceof IUpdatable) {
                 ((IUpdatable) arr.get(i)).update(deltaTime);
+            }
+        }
     }
 
     public void start() {
         Log.d(LOG, "Game start() called");
         startSongSecond = System.currentTimeMillis();
         playing = true;
+        cleanThread.start();
     }
 
     void destroyNote(Note note, boolean touched) {
@@ -460,7 +516,7 @@ public class Game implements OnTouchListener {
                         case 14:
                         case 28:
                         case 42:
-                            scoreBar.increaseMultiplier(1);
+                            scoreBar.increaseMultiplier();
                             break;
                     }
                 }
@@ -471,44 +527,17 @@ public class Game implements OnTouchListener {
     public void onDestroy() {
         Log.d(LOG, "Game onDestroy() called");
         playing = false;
-        if (isMidi) {
-            if (mpDrumsOnly != null) {
-                mpDrumsOnly.stop();
-                mpDrumsOnly.release();
-            }
-            if (mpMusicOnly != null) {
-                mpMusicOnly.stop();
-                mpMusicOnly.release();
-            }
-        } else {
-            mpAllMusic.stop();
-            mpAllMusic.release();
+        if (mpDrumsOnly != null) {
+            mpDrumsOnly.stop();
+            mpDrumsOnly.release();
+        }
+        if (mpMusicOnly != null) {
+            mpMusicOnly.stop();
+            mpMusicOnly.release();
         }
         scoreBar.onDestroy();
         notes.clear();
         notesClone.clear();
-    }
-
-    public void onPause() {
-        Log.d(LOG, "Game onPause() called");
-        pauseSecond = System.currentTimeMillis();
-        playing = false;
-        if (isMidi) {
-            switch (mode) {
-                case GAME:
-                    mpDrumsOnly.pause();
-                    mpMusicOnly.pause();
-                    break;
-                case ONLYDRUMS:
-                    mpDrumsOnly.pause();
-                    break;
-                case ONLYMUSIC:
-                    mpMusicOnly.pause();
-                    break;
-            }
-        } else {
-            mpAllMusic.pause();
-        }
     }
 
     public void onResume() {
@@ -516,44 +545,58 @@ public class Game implements OnTouchListener {
         notesClone.clear();
         playing = true;
         startSongSecond += System.currentTimeMillis() - pauseSecond;
-        if (!isMidi) {
-            //mpAllMusic.seekTo((int) (currentSecond));
-            mpAllMusic.start();
-        } else {
-            switch (mode) {
-                case GAME:
-                    mpDrumsOnly.start();
-                    mpMusicOnly.start();
-                    break;
-                case ONLYDRUMS:
-                    mpDrumsOnly.start();
-                    break;
-                case ONLYMUSIC:
-                    mpMusicOnly.start();
-                    break;
-            }
+        switch (mode) {
+            case GAME:
+                mpDrumsOnly.start();
+                mpMusicOnly.start();
+                break;
+            case ONLYDRUMS:
+                mpDrumsOnly.start();
+                break;
+            case ONLYMUSIC:
+                mpMusicOnly.start();
+                break;
+        }
+
+    }
+
+    public void onPause() {
+        Log.d(LOG, "Game onPause() called");
+        pauseSecond = System.currentTimeMillis();
+        playing = false;
+        switch (mode) {
+            case GAME:
+                mpDrumsOnly.pause();
+                mpMusicOnly.pause();
+                break;
+            case ONLYDRUMS:
+                mpDrumsOnly.pause();
+                break;
+            case ONLYMUSIC:
+                mpMusicOnly.pause();
+                break;
         }
     }
 
     public void setGameEnded() {
         Log.d(LOG, "Game setGameEnded() called");
         onPause();
+        cleanThread.interrupt();
         gameEnded = true;
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                db.putScore(titleByName, scoreBar.getScore());
-            }
-        }).run();
+        new Thread(() -> db.putScore(titleByName, scoreBar.getScore())).start();
     }
 
     public void onGameEnded(boolean win) {
         Log.d(LOG, "Game onGameEnded() called");
+        setGameEnded();
         intentGameEnded.putExtra(activity.getString(R.string.GameEndedIntentWin), win);
-        intentGameEnded.putExtra(activity.getString(R.string.GameEndedIntentScore), scoreBar.getScore());
+        intentGameEnded.putExtra(activity.getString(R.string.GameEndedIntentScore),
+                scoreBar.getScore());
         intentGameEnded.putExtra(activity.getString(R.string.GameIntentTitleByName), titleByName);
-        intentGameEnded.putExtra(activity.getString(R.string.GameEndedIntentBestScore), db.getBestScore(titleByName));
+        intentGameEnded.putExtra(activity.getString(R.string.GameEndedIntentBestScore),
+                db.getBestScore(titleByName));
         activity.startActivity(intentGameEnded);
+        destroy();
     }
 
     public void addExplosion(Note note) {
@@ -577,16 +620,16 @@ public class Game implements OnTouchListener {
 
         @Override
         public void run() {
-            try {/*
-                System.out.println("From Game notesClone size == "+notesClone.size()
-                        +"; explosions size == "+ explosions.size()+"; trashCanSize == " + trashCan.size());*/
-                explosions.removeAll(trashCan);
-                notesClone.removeAll(trashCan);/*
-                System.out.println("From Game notesClone size == "+notesClone.size()
-                        +"; explosions size == "+ explosions.size()+"; trashCanSize == " + trashCan.size());*/
-                trashCan.clear();
-            } catch (Exception e) {
-                e.printStackTrace();
+            while (true) {
+                if (playing) {
+                    try {
+                        explosions.removeAll(trashCan);
+                        notesClone.removeAll(trashCan);
+                        trashCan.clear();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         }
     }

@@ -1,12 +1,15 @@
 package com.ShomazzApp.drumhero;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.PixelFormat;
+import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
@@ -15,31 +18,39 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.ShomazzApp.drumhero.game.Game;
+import com.ShomazzApp.drumhero.game.GameController;
 import com.ShomazzApp.drumhero.utils.MySurfaceView;
+import com.ShomazzApp.drumhero.utils.ResourcesHelper;
 
-public class GameActivity extends Activity {
+public class GameActivity extends Activity implements GameController {
 
-    private static final String log = "ADDDA";
-    private static final String sharedKey = "count";
-    public static boolean noTappersMode;
-    public static View pauseView;
-    public static String titleByName;
-    public static Intent intentGameEnd = new Intent();
-    private static RelativeLayout layoutGame;
+    public boolean isNoTappersMode;
     private static int difficulty;
     private static int mode;
+    public static String titleByName;
     private static String songPath;
     private static String tableName;
-    private static Intent intentSongs = new Intent();
-    private static Intent intentMainMenu = new Intent();
-    private SharedPreferences sharedPreferences;
     private int tappedButtonId;
-    private SharedPreferences mSettings;
-    private Button btnResume, btnNewSong, btnMainMenu, btnEndGame;
+    private Button btnResume;
+    private Button btnNewSong;
+    private Button btnMainMenu;
+    private Button btnEndGame;
     private Game game;
-    private RelativeLayout pause;
-    private Toast waitForBeginToast;
-    private MySurfaceView mySV;
+    private RelativeLayout pauseView;
+    private MySurfaceView surfaceView;
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        game = null;
+        surfaceView = null;
+        btnResume = null;
+        btnNewSong = null;
+        btnMainMenu = null;
+        btnEndGame = null;
+        pauseView = null;
+    }
+
     private View.OnTouchListener onTouchListener = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
@@ -64,7 +75,9 @@ public class GameActivity extends Activity {
                     break;
                 case MotionEvent.ACTION_UP:
                     tappedButtonId = v.getId();
-                    if (game == null) game = mySV.getGame();
+                    if (game == null) {
+                        game = surfaceView.getGame();
+                    }
                     switch (v.getId()) {
                         case R.id.btnResume:
                             btnResume.setTextColor(0xFFFFFFFF);
@@ -72,7 +85,6 @@ public class GameActivity extends Activity {
                             game.onResume();
                             break;
                         case R.id.btnMainMenu:
-                            Log.d(log, "onMainMenu");
                             game.setGameEnded();
                             btnMainMenu.setTextColor(0xFFFFFFFF);
                             startNeededActivity();
@@ -98,59 +110,68 @@ public class GameActivity extends Activity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_game);
-        sharedPreferences = getSharedPreferences(
-                getString(R.string.shar), Context.MODE_PRIVATE);
-        mSettings = getSharedPreferences(SettingsActivity.APP_PREFERENCES, Context.MODE_PRIVATE);
-        if (mSettings.contains(SettingsActivity.APP_PREFERENCES_GAMEPLAY)) {
-            noTappersMode = mSettings.getBoolean(SettingsActivity.APP_PREFERENCES_GAMEPLAY, false);
-        } else noTappersMode = false;
-        mySV = (MySurfaceView) findViewById(R.id.mySurfaceView);
-        mySV.destroyDrawingCache();
-        if (!getIntent().getStringExtra(getString(R.string.GameIntentSongPath)).equals(GameEndedActivity.nothing)) {
+        initViews();
+        setOnTouchListeners();
+        isNoTappersMode = getIsNoTappersMode();
+        if (!getIntent().getStringExtra(getString(R.string.GameIntentSongPath)).equals(
+                GameEndedActivity.nothing)) {
             songPath = getIntent().getStringExtra(getString(R.string.GameIntentSongPath));
             tableName = getIntent().getStringExtra(getString(R.string.GameIntentTableName));
             titleByName = getIntent().getStringExtra(getString(R.string.GameIntentTitleByName));
-            difficulty = getIntent().getIntExtra(getString(R.string.GameIntentDifficulty), Game.EASY);
+            difficulty = getIntent().getIntExtra(getString(R.string.GameIntentDifficulty),
+                    Game.EASY);
             mode = getIntent().getIntExtra(getString(R.string.GameIntentMode), Game.GAME);
         }
-        pause = (RelativeLayout) findViewById(R.id.pauseView);
-        game = new Game(this, songPath, tableName, titleByName, difficulty, mode, noTappersMode);
-        intentSongs = new Intent(GameActivity.this, SongsActivity.class);
-        intentMainMenu = new Intent(GameActivity.this, MainMenuActivity.class);
-        intentGameEnd = new Intent(GameActivity.this, GameEndedActivity.class);
-        mySV.getHolder().setFormat(PixelFormat.RGBA_8888);
-        mySV.setGame(game);
+        game = new Game(this, songPath, tableName, titleByName, difficulty, mode, isNoTappersMode);
+        setupSurface(game);
+        new LoadResourcesAsyncTask(this, surfaceView).execute();
+    }
+
+    private boolean getIsNoTappersMode() {
+        boolean isNoTappersMode = false;
+        SharedPreferences settingsSharedPref = getSharedPreferences(
+                SettingsActivity.APP_PREFERENCES,
+                Context.MODE_PRIVATE
+        );
+        if (settingsSharedPref.contains(SettingsActivity.APP_PREFERENCES_GAMEPLAY)) {
+            isNoTappersMode = settingsSharedPref.getBoolean(
+                    SettingsActivity.APP_PREFERENCES_GAMEPLAY,
+                    false);
+        }
+        return isNoTappersMode;
+    }
+
+    @Override
+    public void onGameEnded() {
+        if (!game.gameEnded) {
+            Intent intentGameEnd = new Intent(GameActivity.this, GameEndedActivity.class);
+            intentGameEnd.putExtra(getString(R.string.GameEndedIntentWin), false);
+            startActivity(intentGameEnd);
+        }
+        //TODO: putExtra song to have possibility to restart game
+    }
+
+    private void setupSurface(Game game) {
+        surfaceView.destroyDrawingCache();
+        surfaceView.getHolder().setFormat(PixelFormat.RGBA_8888);
+        surfaceView.setGame(game);
+    }
+
+    private void initViews() {
+        surfaceView = (MySurfaceView) findViewById(R.id.mySurfaceView);
+        pauseView = (RelativeLayout) findViewById(R.id.pauseView);
         btnEndGame = (Button) findViewById(R.id.btnGameEnded);
         btnNewSong = (Button) findViewById(R.id.btnNewSong);
         btnResume = (Button) findViewById(R.id.btnResume);
         btnMainMenu = (Button) findViewById(R.id.btnMainMenu);
-        layoutGame = (RelativeLayout) findViewById(R.id.layout_game);
-        pauseView = findViewById(R.id.pauseView);
-        waitForBeginToast = Toast.makeText(this, "Wait for game beginning", Toast.LENGTH_LONG);
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private void setOnTouchListeners() {
         btnNewSong.setOnTouchListener(onTouchListener);
         btnEndGame.setOnTouchListener(onTouchListener);
         btnMainMenu.setOnTouchListener(onTouchListener);
         btnResume.setOnTouchListener(onTouchListener);
-    }
-
-    public int getCount() {
-        int count = -1;
-        if (sharedPreferences.contains(sharedKey))
-            count = sharedPreferences.getInt(sharedKey, count);
-        SharedPreferences.Editor ed = sharedPreferences.edit();
-        ed.putInt(sharedKey, ++count);
-        ed.commit();
-        Log.d(log, "Count == " + count);
-        return count;
-    }
-
-    public void showAddOrStartActivity() {
-        /*if (Appodeal.isLoaded(Appodeal.NON_SKIPPABLE_VIDEO))
-            if (getCount() % 3 == 0)
-                Appodeal.show(GameActivity.this, Appodeal.NON_SKIPPABLE_VIDEO);
-            else startNeededActivity();
-        else*/
-        startNeededActivity();
     }
 
     public void startNeededActivity() {
@@ -160,52 +181,71 @@ public class GameActivity extends Activity {
                 game.onGameEnded(false);
                 break;
             case R.id.btnMainMenu:
-                startActivity(intentMainMenu);
+                startActivity(new Intent(GameActivity.this, MainMenuActivity.class));
                 break;
             case R.id.btnNewSong:
-                startActivity(intentSongs);
+                startActivity(new Intent(GameActivity.this, SongsActivity.class));
                 break;
-        }
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (game.gameStarted) {
-            if (pause.getVisibility() == View.GONE) {
-                game.onPause();
-                pause.setVisibility(View.VISIBLE);
-            }
-        } else {
-            waitForBeginToast.show();
         }
     }
 
     @Override
     protected void onStop() {
-        Log.d("GameActivity", "onStop() called");
-        if (mySV != null) {
-            Log.d("GameActivity", "set gone visibility called");
-            mySV.setVisibility(View.GONE);
-        }
-        if (!game.gameEnded) {
-            intentGameEnd.putExtra(getString(R.string.GameEndedIntentWin), false);
-            startActivity(intentGameEnd);
-        }
+        onGameEnded();
         super.onStop();
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        Log.d("GameActivity", "onResume() called");
-        if (mySV != null) {
-            Log.d("GameActivity", "set gone visibility called");
-            mySV.setVisibility(View.VISIBLE);
+    public void onBackPressed() {
+        if (game.gameStarted) {
+            if (pauseView.getVisibility() == View.GONE) {
+                game.onPause();
+                pauseView.setVisibility(View.VISIBLE);
+            }
+        } else {
+            Toast waitForBeginToast = Toast.makeText(this, "Wait for game beginning",
+                    Toast.LENGTH_LONG);
+            waitForBeginToast.show();
         }
     }
+
+    static class LoadResourcesAsyncTask extends AsyncTask<Void, Void, Void> {
+
+        private ProgressDialog pDialog;
+        private Drawable progressDrawable;
+        private MySurfaceView surfaceView;
+
+        LoadResourcesAsyncTask(Context context, MySurfaceView surface) {
+            surfaceView = surface;
+            pDialog = new ProgressDialog(context);
+            progressDrawable = context.getResources().getDrawable(R.drawable.progress);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            pDialog.setIndeterminateDrawable(progressDrawable);
+            pDialog.setMessage("Loading resources... Get ready to rock!");
+            pDialog.setIndeterminate(false);
+            pDialog.setCancelable(false);
+            pDialog.show();
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(Void... arg0) {
+            surfaceView.getGame().loadBitmaps();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            surfaceView.startGame();
+            pDialog.dismiss();
+            pDialog = null;
+            surfaceView = null;
+            progressDrawable = null;
+            super.onPostExecute(result);
+        }
+    }
+
 }

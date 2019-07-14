@@ -79,7 +79,7 @@ public class DestroyLine implements IDrawable {
         // destroying, then boolean destroyed == false
         boolean destroyed = false;
         for (int i = 0; i < game.getNotesClone().size(); i++) {
-            if (game.getNotesClone().get(i).getNoteY() > y
+            if (game.getNotesClone().get(i) != null && game.getNotesClone().get(i).getNoteY() > y
                     && game.getNotesClone().get(i).getNoteY() < y + height + Note.getNoteHeight(game.noTappersMode) / 2
                     && game.getNotesClone().get(i).getNumberOfLine() == numberOfDestroyLine) {
                 game.destroyNote(game.getNotesClone().get(i), true);

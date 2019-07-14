@@ -90,7 +90,6 @@ public class WebActivity extends Activity {
                     SongsActivity.songArrayList.size() + 1);
            // AddToDB toDBTask = new AddToDB(s, file);
             //toDBTask.execute();
-            SongsActivity.adapter.notifyDataSetChanged();
             editNameOfSong.setText("");
             editNameOfArtist.setText("");
             System.out.println("From Web newSong.getFileName == " + s.getFileName());
@@ -153,7 +152,7 @@ public class WebActivity extends Activity {
             //saveSongView.setVisibility(View.GONE);
             System.out.println("From Web added to db");
             //WebActivity.this.startActivity(songsActvityIntent);
-            Toast t = Toast.makeText(context, "Song added", 2000);
+            Toast t = Toast.makeText(context, "Song added", Toast.LENGTH_LONG);
             t.show();
         }
 
