@@ -1,9 +1,12 @@
 package com.ShomazzApp.drumhero;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
@@ -14,8 +17,6 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.ShomazzApp.drumhero.utils.DBManager;
-import com.appodeal.ads.Appodeal;
-import com.appodeal.ads.utils.PermissionsHelper;
 
 public class MainMenuActivity extends Activity {
 
@@ -24,6 +25,8 @@ public class MainMenuActivity extends Activity {
 	private Animation anim0;
 	boolean tappedOnBack = false;
 	private SharedPreferences mSettings;
+
+	private final String[] PERMISSIONS = {"android.permission.WRITE_EXTERNAL_STORAGE"};
 
 	private View.OnTouchListener onTouchListener = new View.OnTouchListener() {
 		@Override
@@ -73,17 +76,7 @@ public class MainMenuActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_menu);
-		Appodeal.setTesting(false);
-		Appodeal.show(this, Appodeal.BANNER_BOTTOM);
-		Appodeal.requestAndroidMPermissions(this, new PermissionsHelper.AppodealPermissionCallbacks(){
-			@Override
-			public void writeExternalStorageResponse(int result) {
-			}
-
-			@Override
-			public void accessCoarseLocationResponse(int result) {
-			}
-		});
+		requestStoragePermission();
 		btnStart = (Button) findViewById(R.id.btnStart);
 		btnSettings = (Button) findViewById(R.id.btnSettings);
 		anim0 = AnimationUtils.loadAnimation(this, R.anim.anim0);
@@ -125,14 +118,8 @@ public class MainMenuActivity extends Activity {
 	}
 
 	@Override
-	protected void onResume() {
-		super.onResume();
-		Appodeal.onResume(this, Appodeal.BANNER_BOTTOM);
-	}
-
-	@Override
 	public void onBackPressed() {
-		if (!tappedOnBack == true) {
+		if (!tappedOnBack) {
 			tappedOnBack = true;
 			Toast t = Toast.makeText(this, "Tap one more time to exit app", Toast.LENGTH_LONG);
 			t.show();
@@ -141,4 +128,33 @@ public class MainMenuActivity extends Activity {
 			tappedOnBack = false;
 		}
 	}
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+		if (grantResults[0] != PackageManager.PERMISSION_GRANTED)
+			requestPermissionIfNeed();
+	}
+
+	private boolean canMakeSmores() {
+		return (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1);
+	}
+
+	@TargetApi(23)
+	private void requestPermissionIfNeed() {
+		requestPermissions(PERMISSIONS, 200);
+	}
+
+	@TargetApi(23)
+	private boolean hasPermission(String permission) {
+		if (canMakeSmores()) {
+			return (checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED);
+		}
+		return true;
+	}
+
+	private void requestStoragePermission(){
+		if (!hasPermission(PERMISSIONS[0]))
+			requestPermissionIfNeed();
+	}
+
 }

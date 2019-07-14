@@ -205,12 +205,12 @@ public class AdapterCustomCloud extends BaseAdapter {
 
         public void musicStopped() {
             System.out.println("musicStopped");
-            btnPlay.setBackgroundResource(R.drawable.ic_play_dark);
+            btnPlay.setBackgroundResource(R.drawable.ic_media_play_dark);
         }
 
         public void musicPlaying() {
             System.out.println("Music playibng");
-            btnPlay.setBackgroundResource(R.drawable.ic_pause_dark);
+            btnPlay.setBackgroundResource(R.drawable.ic_media_pause_dark);
         }
 
     }

@@ -16,7 +16,6 @@ import android.widget.Toast;
 
 import com.ShomazzApp.drumhero.game.Game;
 import com.ShomazzApp.drumhero.utils.MySurfaceView;
-import com.appodeal.ads.Appodeal;
 
 public class GameActivity extends Activity {
 
@@ -68,7 +67,6 @@ public class GameActivity extends Activity {
                     if (game == null) game = mySV.getGame();
                     switch (v.getId()) {
                         case R.id.btnResume:
-                            Appodeal.hide(GameActivity.this, Appodeal.BANNER_BOTTOM);
                             btnResume.setTextColor(0xFFFFFFFF);
                             pauseView.setVisibility(View.GONE);
                             game.onResume();
@@ -102,7 +100,6 @@ public class GameActivity extends Activity {
         setContentView(R.layout.activity_game);
         sharedPreferences = getSharedPreferences(
                 getString(R.string.shar), Context.MODE_PRIVATE);
-        Appodeal.hide(GameActivity.this, Appodeal.BANNER_BOTTOM);
         mSettings = getSharedPreferences(SettingsActivity.APP_PREFERENCES, Context.MODE_PRIVATE);
         if (mSettings.contains(SettingsActivity.APP_PREFERENCES_GAMEPLAY)) {
             noTappersMode = mSettings.getBoolean(SettingsActivity.APP_PREFERENCES_GAMEPLAY, false);
@@ -180,7 +177,6 @@ public class GameActivity extends Activity {
     public void onBackPressed() {
         if (game.gameStarted) {
             if (pause.getVisibility() == View.GONE) {
-                Appodeal.show(GameActivity.this, Appodeal.BANNER_BOTTOM);
                 game.onPause();
                 pause.setVisibility(View.VISIBLE);
             }

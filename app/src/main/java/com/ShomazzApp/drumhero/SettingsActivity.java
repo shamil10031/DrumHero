@@ -14,7 +14,6 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.ShomazzApp.drumhero.utils.DBManager;
-import com.appodeal.ads.Appodeal;
 
 public class SettingsActivity extends Activity {
 
@@ -102,7 +101,6 @@ public class SettingsActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		Appodeal.show(this, Appodeal.BANNER_BOTTOM);
 		setContentView(R.layout.activity_settings);
 		rlayAccept = (RelativeLayout) findViewById(R.id.clearScoresAcceptLayout);
 		gamePlayDefault = (ImageView) findViewById(R.id.gamePlayDefault);
@@ -146,12 +144,6 @@ public class SettingsActivity extends Activity {
 		} else {
 			rlayAccept.setVisibility(View.GONE);
 		}
-	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-		Appodeal.onResume(this, Appodeal.BANNER_BOTTOM);
 	}
 
 	@Override

@@ -32,7 +32,6 @@ import com.ShomazzApp.drumhero.utils.AdapterCustomCloud;
 import com.ShomazzApp.drumhero.utils.AdapterCustomDefault;
 import com.ShomazzApp.drumhero.utils.DBManager;
 import com.ShomazzApp.drumhero.utils.MySurfaceView;
-import com.appodeal.ads.Appodeal;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -241,7 +240,6 @@ public class SongsActivity extends Activity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_songs);
-        Appodeal.onResume(this, Appodeal.BANNER_BOTTOM);
         footerView = getLayoutInflater().inflate(R.layout.list_item_view_more_song, null);
         btnViewMore = (Button) footerView.findViewById(R.id.btn_view_more);
         defaultListView = true;
@@ -307,10 +305,7 @@ public class SongsActivity extends Activity {
         listView.setOnItemClickListener(onItemClickListener);
         mtsk.execute();
         ConstructorActivity.isConstructorActivity = false;
-        radioGroupDifficulty.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
+        radioGroupDifficulty.setOnCheckedChangeListener((group, checkedId) -> {
                 switch (checkedId) {
                     case -1:
                         break;
@@ -338,7 +333,6 @@ public class SongsActivity extends Activity {
                 startActivity(intentGameActivity);
                 rlayStartSong.setVisibility(View.GONE);
 
-            }
         });
         /*radioGroupMode.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 
@@ -378,12 +372,6 @@ public class SongsActivity extends Activity {
         if (adapterWeb != null) {
             adapterWeb.onPause();
         }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Appodeal.onResume(this, Appodeal.BANNER_BOTTOM);
     }
 
     private void updateListView() {
