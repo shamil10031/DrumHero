@@ -8,11 +8,8 @@ out/
 *.classpath
 *.project
 captures/
-.mainframer/*
-mainframer.sh
 
 buildsystem/localDependencies.gradle
-market/src/qa/java/ru/yandex/market/activity/config/LocalConfigInitializer.java
 
 .gradle/
 build/
