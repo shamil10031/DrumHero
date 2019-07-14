@@ -1,0 +1,10 @@
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/blue_crash1" android:duration="250" />
+    <item android:drawable="@drawable/blue_crash2" android:duration="250" />
+    <item android:drawable="@drawable/green_crash1" android:duration="250" />
+    <item android:drawable="@drawable/green_crash2" android:duration="250" />
+    <item android:drawable="@drawable/red_crash1" android:duration="250" />
+    <item android:drawable="@drawable/red_crash2" android:duration="250" />
+    <item android:drawable="@drawable/yellow_crash1" android:duration="250" />
+    <item android:drawable="@drawable/yellow_crash2" android:duration="250" />
+</animation-list>

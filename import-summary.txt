@@ -1,0 +1,81 @@
+ECLIPSE ANDROID PROJECT IMPORT SUMMARY
+======================================
+
+Ignored Files:
+--------------
+The following files were *not* copied into the new Gradle project; you
+should evaluate whether these are still needed in your project and if
+so manually move them:
+
+* .gitignore
+* README.md
+* desktop.ini
+* dh.ico
+* ic_launcher-web.png
+* pictures\
+* pictures\GameOver.svg
+* pictures\ListView.svg
+* pictures\blue_crash1.svg
+* pictures\blue_crash2.svg
+* pictures\blue_desline.svg
+* pictures\blue_note2.svg
+* pictures\btnMainMenu.svg
+* pictures\btnRestart.svg
+* pictures\destapper3.svg
+* pictures\display.svg
+* pictures\drums.svg
+* pictures\green_crash1.svg
+* pictures\green_crash2.svg
+* pictures\green_desline.svg
+* pictures\green_note2.svg
+* pictures\ic_add_song.svg
+* pictures\icon.svg
+* pictures\line.svg
+* pictures\list_view.png
+* pictures\list_view_touched.png
+* pictures\menu_background.png
+* pictures\menu_background.svg
+* pictures\options_button.svg
+* pictures\p9dKicYYklI.jpg
+* pictures\red_crash1.svg
+* pictures\red_crash2.svg
+* pictures\red_desline.svg
+* pictures\red_note2.svg
+* pictures\score_bar.svg
+* pictures\score_indicator.svg
+* pictures\song_button.svg
+* pictures\start_button.svg
+* pictures\stop_button_holded.svg
+* pictures\yellow_crash1.svg
+* pictures\yellow_crash2.svg
+* pictures\yellow_desline.svg
+* pictures\yellow_note2.svg
+* pictures\youAreDrumHero.svg
+* proguard-project.txt
+
+Moved Files:
+------------
+Android Gradle projects use a different directory structure than ADT
+Eclipse projects. Here's how the projects were restructured:
+
+* AndroidManifest.xml => app\src\main\AndroidManifest.xml
+* assets\ => app\src\main\assets\
+* lint.xml => app\lint.xml
+* res\ => app\src\main\res\
+* src\ => app\src\main\java\
+* src\com\drumhero\utils\.gitignore => app\src\main\resources\com\drumhero\utils\.gitignore
+
+Next Steps:
+-----------
+You can now build the project. The Gradle project needs network
+connectivity to download dependencies.
+
+Bugs:
+-----
+If for some reason your project does not build, and you determine that
+it is due to a bug or limitation of the Eclipse to Gradle importer,
+please file a bug at http://b.android.com with category
+Component-Tools.
+
+(This import summary is for your information only, and can be deleted
+after import once you are satisfied with the results.)

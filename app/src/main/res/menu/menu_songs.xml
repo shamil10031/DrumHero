@@ -1,0 +1,16 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".SongsActivity" >
+
+    <item
+        android:id="@+id/addFromWeb"
+        android:title="Web"/>
+    <item
+        android:id="@+id/addFromStorage"
+        android:title="Storage"/>
+    <item
+        android:id="@+id/addFromFavorites"
+        android:title="Favorites"/>
+
+</menu>

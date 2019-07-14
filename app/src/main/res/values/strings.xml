@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Drum Hero</string>
+    <string name="title_activity_game">GameActivity</string>
+    <string name="title_activity_web">WebActivity</string>
+    <string name="title_activity_game_ended">GameEndedActivity</string>
+    <string name="title_activity_constructor">ConstructorActivity</string>
+
+    <string name="shar">sharedd</string>
+    <string name="SongsIntentDeleteSongs">deleteSongs</string>
+    <string name="GameIntentSongPath">songPath</string>
+    <string name="GameIntentTableName">tableName</string>
+    <string name="GameIntentTitleByName">titleName</string>
+    <string name="GameIntentDifficulty">difficulty</string>
+    <string name="GameIntentMode">mode</string>
+    <string name="GameEndedIntentWin">win</string>
+    <string name="GameEndedIntentScore">score</string>
+    <string name="GameEndedIntentBestScore">bestScore</string>
+
+</resources>

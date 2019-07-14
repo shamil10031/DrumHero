@@ -1,0 +1,26 @@
+bin/
+gen/
+.idea/*
+*.iml
+out/
+*local.properties
+.DS_Store
+*.classpath
+*.project
+captures/
+.mainframer/*
+mainframer.sh
+
+buildsystem/localDependencies.gradle
+market/src/qa/java/ru/yandex/market/activity/config/LocalConfigInitializer.java
+
+.gradle/
+build/
+#gradle/wrapper
+
+# No Ignore Shared Inspections
+!.idea/inspectionProfiles/
+!.idea/codeStyles/
+!.idea/runConfigurations/
+
+workflow-conf.txt

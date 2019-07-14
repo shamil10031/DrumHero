@@ -1,0 +1,81 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="${relativePackage}.${activityClass}"
+    android:id="@+id/webActivityView" >
+
+    <WebView
+        android:id="@+id/webView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <RelativeLayout
+        android:id="@+id/saveSongView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#CC222222"
+        android:orientation="horizontal"
+        android:visibility="gone" >
+
+        <EditText
+            android:id="@+id/editNameOfArtist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/editNameOfSong"
+            android:layout_below="@+id/textViewAboveArtistName"
+            android:ems="10"
+            android:hint="Artist or Group"
+            android:inputType="textPersonName"
+            android:textColorHint="#9900FF00"
+			android:textColor="#FFFFFFFF">
+
+        </EditText>
+
+        <TextView
+            android:id="@+id/textViewAboveSongName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="53dp"
+            android:text="Enter The Name Of The Song"
+            android:textColor="#FFFFFFFF"
+            android:textSize="25dp" />
+
+        <EditText
+            android:id="@+id/editNameOfSong"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textViewAboveSongName"
+            android:layout_centerHorizontal="true"
+            android:ems="10"
+            android:hint="Song"
+            android:inputType="textPersonName"
+            android:textColorHint="#9900FF00"
+            android:textColor="#FFFFFFFF" />
+
+        <TextView
+            android:id="@+id/textViewAboveArtistName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/editNameOfSong"
+            android:layout_centerHorizontal="true"
+            android:text="Enter The Name Of The Artist"
+            android:textColor="#FFFFFFFF"
+            android:textSize="25dp" />
+
+        <Button
+            android:id="@+id/pushNames"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/editNameOfArtist"
+            android:layout_centerHorizontal="true"
+            android:text="Add"
+            android:background="#00000000"
+            android:textColor="#FFFFFFFF"
+            android:onClick="onPushNames" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

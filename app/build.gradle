@@ -1,0 +1,69 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 26
+
+    configurations {
+        all*.exclude group: 'com.android.support', module: 'support-v4'
+        all*.exclude group: 'com.android.support', module: 'support-annotations'
+    }
+
+    dexOptions {
+        dexInProcess = false
+        javaMaxHeapSize "4g"
+    }
+
+    defaultConfig {
+        applicationId "com.ShomazzApp.drumhero"
+        minSdkVersion 14
+        targetSdkVersion 26
+        multiDexEnabled true
+    }
+
+    repositories {
+        jcenter()
+        flatDir {
+            dirs 'aars'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+}
+
+
+dependencies {
+    implementation 'com.google.android.gms:play-services:10.2.1'
+    implementation 'com.google.android.gms:play-services-ads:10.2.1'
+    implementation 'com.google.android.gms:play-services-location:10.2.1'
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation name: 'adcolony-sdk-3.2.1', ext: 'aar'
+    implementation name: 'mmedia-6.4.0', ext: 'aar'
+    implementation name: 'mobvista_alphab', ext: 'aar'
+    implementation name: 'mobvista_appwall', ext: 'aar'
+    implementation name: 'mobvista_appwallext', ext: 'aar'
+    implementation name: 'mobvista_common', ext: 'aar'
+    implementation name: 'mobvista_interstitial', ext: 'aar'
+    implementation name: 'mobvista_mvdownloads', ext: 'aar'
+    implementation name: 'mobvista_mvjscommon', ext: 'aar'
+    implementation name: 'mobvista_mvnative', ext: 'aar'
+    implementation name: 'mobvista_nativeex', ext: 'aar'
+    implementation name: 'mobvista_offerwall', ext: 'aar'
+    implementation name: 'mobvista_playercommon', ext: 'aar'
+    implementation name: 'mobvista_reward', ext: 'aar'
+    implementation name: 'mobvista_videocommon', ext: 'aar'
+    implementation name: 'mobvista_videofeeds', ext: 'aar'
+/*    implementation files('libs/applovin-6.2.2.jar')
+    implementation files('libs/appodeal-1.14.15.jar')
+    implementation files('libs/chartboost-6.4.1.jar')
+    implementation files('libs/flurry-analytics-6.2.0.jar')
+    implementation files('libs/inmobi-5.3.1.jar')
+    implementation files('libs/jsoup-1.9.2.jar')
+    implementation files('libs/my-target-4.5.1.jar')
+    implementation project(':unity-ads-1.5.6')
+    implementation files('libs/yandex-metrica-2.41.jar')*/
+}

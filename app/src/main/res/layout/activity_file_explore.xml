@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/main_background" >
+    
+    <RelativeLayout
+        android:id="@+id/saveSongViewFromStorage"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#00444444"
+        android:orientation="horizontal"
+        android:visibility="visible" >
+
+        <EditText
+            android:id="@+id/editNameOfArtistFromStorage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/editNameOfSongFromStorage"
+            android:layout_below="@+id/textViewAboveArtistNameFromStorage"
+
+
+            android:hint="Artist or Group"
+            android:inputType="textPersonName"
+            android:textColorHint="#9900FF00"
+            android:textColor="#FFFFFFFF"/>
+
+        <TextView
+            android:id="@+id/textViewAboveSongNameFromStorage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="53dp"
+            android:text="Enter The Name Of The Song"
+            android:textColor="#FFFFFFFF"
+            android:textSize="25dp" />
+
+        <EditText
+            android:id="@+id/editNameOfSongFromStorage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textViewAboveSongNameFromStorage"
+            android:layout_centerHorizontal="true"
+            android:ems="10"
+            android:hint="Song"
+            android:inputType="textPersonName"
+            android:textColorHint="#9900FF00"
+            android:textColor="#FFFFFFFF" />
+
+        <TextView
+            android:id="@+id/textViewAboveArtistNameFromStorage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/editNameOfSongFromStorage"
+            android:layout_centerHorizontal="true"
+            android:text="Enter The Name Of The Artist"
+            android:textColor="#FFFFFFFF"
+            android:textSize="25dp" />
+
+        <Button
+            android:id="@+id/pushNamesFromStorage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/editNameOfArtistFromStorage"
+            android:layout_centerHorizontal="true"
+            android:text="Add"
+            android:background="#00000000"
+            android:textColor="#FFFFFFFF"
+            android:onClick="onPushNamesFromStorage" />
+
+    </RelativeLayout>
+
+</RelativeLayout>
