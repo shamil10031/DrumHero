@@ -3,7 +3,6 @@ package com.ShomazzApp.drumhero.game;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
-import android.util.Log;
 
 import com.ShomazzApp.drumhero.utils.MySurfaceView;
 

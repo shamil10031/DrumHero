@@ -1,9 +1,9 @@
 package com.ShomazzApp.drumhero;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import com.ShomazzApp.drumhero.R;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;

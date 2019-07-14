@@ -12,8 +12,8 @@ import android.view.Window;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ShomazzApp.drumhero.fileexplore.FileExplore;
 import com.ShomazzApp.drumhero.game.Note;
-import com.ShomazzApp.drumhero.R;
 import com.ShomazzApp.drumhero.game.Song;
 import com.ShomazzApp.drumhero.utils.LineToTable;
 import com.leff.midi.MidiFile;
@@ -21,7 +21,6 @@ import com.leff.midi.MidiTrack;
 import com.leff.midi.event.MidiEvent;
 import com.leff.midi.event.NoteOn;
 import com.leff.midi.event.meta.Tempo;
-import com.ShomazzApp.drumhero.fileexplore.FileExplore;
 
 import java.io.File;
 import java.io.FileNotFoundException;

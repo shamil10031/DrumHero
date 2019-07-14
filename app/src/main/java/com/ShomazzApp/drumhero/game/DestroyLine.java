@@ -3,9 +3,6 @@ package com.ShomazzApp.drumhero.game;
 import android.graphics.Canvas;
 import android.graphics.RectF;
 
-import com.ShomazzApp.drumhero.game.Note;
-import com.ShomazzApp.drumhero.game.Game;
-import com.ShomazzApp.drumhero.game.IDrawable;
 import com.ShomazzApp.drumhero.utils.MySurfaceView;
 
 public class DestroyLine implements IDrawable {

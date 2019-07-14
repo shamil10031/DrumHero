@@ -6,7 +6,6 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
-import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,15 +16,12 @@ import android.widget.TextView;
 
 import com.ShomazzApp.drumhero.ConstructorActivity;
 import com.ShomazzApp.drumhero.R;
-import com.ShomazzApp.drumhero.SongsActivity;
 import com.ShomazzApp.drumhero.WebActivity;
-import com.ShomazzApp.drumhero.game.Explosion;
 import com.ShomazzApp.drumhero.game.Song;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;

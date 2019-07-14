@@ -13,11 +13,9 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.ShomazzApp.drumhero.R;
 import com.ShomazzApp.drumhero.utils.DBManager;
 import com.appodeal.ads.Appodeal;
 import com.appodeal.ads.utils.PermissionsHelper;
-import com.mopub.common.util.Utils;
 
 public class MainMenuActivity extends Activity {
 

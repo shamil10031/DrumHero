@@ -3,23 +3,14 @@ package com.ShomazzApp.drumhero;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Environment;
 import android.view.Window;
 
-import com.ShomazzApp.drumhero.utils.RoboErrorReporter;
-import com.ShomazzApp.drumhero.R;
 import com.appodeal.ads.Appodeal;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 
 public class SplashActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		RoboErrorReporter.bindReporter(this.getApplicationContext());
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.splash);

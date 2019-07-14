@@ -7,8 +7,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.webkit.WebSettings;
@@ -19,16 +17,9 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.ShomazzApp.drumhero.game.Song;
-import com.ShomazzApp.drumhero.R;
 import com.ShomazzApp.drumhero.utils.DBManager;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
-import java.net.URLConnection;
 
 public class WebActivity extends Activity {
 

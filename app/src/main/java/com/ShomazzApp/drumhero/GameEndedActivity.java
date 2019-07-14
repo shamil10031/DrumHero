@@ -3,7 +3,6 @@ package com.ShomazzApp.drumhero;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
@@ -12,11 +11,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.appodeal.ads.Appodeal;
-import com.ShomazzApp.drumhero.R;
 import com.ShomazzApp.drumhero.utils.MySurfaceView;
-import com.appodeal.ads.InterstitialCallbacks;
-import com.appodeal.ads.NonSkippableVideoCallbacks;
 
 public class GameEndedActivity extends Activity {
 
