@@ -126,7 +126,7 @@ public class DestroyLine implements IDrawable {
     }
 
     public static int getDestroyLineWidth(boolean noTappersMode) {
-        return Note.getNoteWidth(noTappersMode) + sizeDifferenceFromNote;
+        return (int)Note.getNoteWidth(noTappersMode) + sizeDifferenceFromNote;
     }
 
     public static int getDestroyLineHeight(boolean noTappersMode) {

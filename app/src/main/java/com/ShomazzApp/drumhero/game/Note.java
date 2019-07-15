@@ -158,7 +158,7 @@ public class Note implements IUpdatable, IDrawable {
         }
     }
 
-    public static int getNoteWidth(boolean noTappersMode) {
+    public static float getNoteWidth(boolean noTappersMode) {
         if (noTappersMode) {
             return Constants.NoTappersMode.NOTE_MAX_WIDTH;
         } else {

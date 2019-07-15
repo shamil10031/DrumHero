@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.util.Log;
 
 import com.ShomazzApp.drumhero.utils.MySurfaceView;
 
@@ -30,7 +31,6 @@ public class Explosion implements IUpdatable, IDrawable {
     private Game game;
 
     public Explosion(Note from, Game game) {
-
         this.game = game;
 
         center = new Vector().set(DestroyLine.getDestroyLineX(from.getNumberOfLine(), game.noTappersMode)
@@ -81,9 +81,9 @@ public class Explosion implements IUpdatable, IDrawable {
             Vector speed = speeds.get(i);
 
             tmp.set(speed).scale(distance).add(center);
-            dst.set(0, 0, (int) diameter / MySurfaceView.sizeWidthCoff, (int) diameter / MySurfaceView.sizeWidthCoff);
-            dst.offset((int) tmp.x / MySurfaceView.sizeWidthCoff, (int) tmp.y / MySurfaceView.sizeHeightCoff);
-            dst.offset((int) -diameter / 2 / MySurfaceView.sizeWidthCoff, (int) -diameter / 2 / MySurfaceView.sizeHeightCoff);
+            dst.set(0, 0,  diameter / MySurfaceView.sizeWidthCoff, diameter / MySurfaceView.sizeWidthCoff);
+            dst.offset( tmp.x / MySurfaceView.sizeWidthCoff,  tmp.y / MySurfaceView.sizeHeightCoff);
+            dst.offset( -diameter / 2 / MySurfaceView.sizeWidthCoff, -diameter / 2 / MySurfaceView.sizeHeightCoff);
 
             paint.setColor(Color.WHITE);
             paint.setAlpha((int) (250 * (diameter / start_diameter)));
@@ -101,7 +101,7 @@ public class Explosion implements IUpdatable, IDrawable {
 
     @Override
     public void update(long deltaTime) {
-        diameter *= 0.8;
+        diameter *= 0.99f;
         if (diameter <= 1)
             game.removeObject(this);
     }

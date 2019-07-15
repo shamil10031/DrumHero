@@ -339,7 +339,7 @@ public class Game implements OnTouchListener {
 
     public void draw(Canvas canvas) {
         drawAllArray(canvas, destroyLines);
-        drawAllNotes(canvas, notesClone);
+        drawAllArray(canvas, notesClone);
         if (!noTappersMode) {
             drawAllArray(canvas, destroyTappers);
         }
@@ -389,7 +389,7 @@ public class Game implements OnTouchListener {
             deltaTime = System.currentTimeMillis() - lastTime;
             if (deltaTime > 0) {
                 lastTime = System.currentTimeMillis();
-                updateAllNotes(notesClone, deltaTime);
+                updateAllArray(notesClone);
                 updateAllArray(explosions);
             }
             // GAME ENDS
@@ -456,7 +456,11 @@ public class Game implements OnTouchListener {
     public void drawAllArray(Canvas canvas, ArrayList arr) {
         for (int i = 0; i < arr.size(); i++) {
             if (arr.get(i) != null && arr.get(i) instanceof IDrawable) {
-                ((IDrawable) arr.get(i)).draw(canvas);
+                try {
+                    ((IDrawable) arr.get(i)).draw(canvas);
+                } catch (Exception e){
+
+                }
             }
         }
     }
@@ -464,7 +468,11 @@ public class Game implements OnTouchListener {
     public void updateAllArray(ArrayList arr) {
         for (int i = 0; i < arr.size(); i++) {
             if (arr.get(i) != null && arr.get(i) instanceof IUpdatable) {
-                ((IUpdatable) arr.get(i)).update(deltaTime);
+                try {
+                    ((IUpdatable) arr.get(i)).update(deltaTime);
+                } catch (Exception e) {
+
+                }
             }
         }
     }
