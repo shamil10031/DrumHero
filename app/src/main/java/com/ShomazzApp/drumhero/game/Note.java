@@ -38,7 +38,9 @@ public class Note implements IUpdatable, IDrawable {
         this.game = game;
         this.startSecond = startSecond;
         this.numberOfLine = numberOfLine;
-        setupSizes(game.noTappersMode);
+        if (game != null) {
+            setupSizes(game.noTappersMode);
+        }
     }
 
     private void setupSizes(boolean isNoTappersMode) {
@@ -128,7 +130,7 @@ public class Note implements IUpdatable, IDrawable {
     public void draw(Canvas canvas) {
         if (!isDead) {
             noteRect = new RectF((x - currentWidth / 2) / MySurfaceView.sizeWidthCoff,
-                    (y - currentHeight / 2) /MySurfaceView.sizeHeightCoff,
+                    (y - currentHeight / 2) / MySurfaceView.sizeHeightCoff,
                     (x + currentWidth / 2) / MySurfaceView.sizeWidthCoff,
                     (y + currentHeight / 2) / MySurfaceView.sizeHeightCoff);
             switch (numberOfLine) {
