@@ -594,6 +594,12 @@ public class Game implements OnTouchListener {
         intentGameEnded.putExtra(activity.getString(R.string.GameIntentTitleByName), titleByName);
         intentGameEnded.putExtra(activity.getString(R.string.GameEndedIntentBestScore),
                 db.getBestScore(titleByName));
+
+        intentGameEnded.putExtra(activity.getString(R.string.GameIntentSongPath), filePath);
+        intentGameEnded.putExtra(activity.getString(R.string.GameIntentTableName), tableName);
+        intentGameEnded.putExtra(activity.getString(R.string.GameIntentTitleByName), titleByName);
+        intentGameEnded.putExtra(activity.getString(R.string.GameIntentDifficulty), difficulty);
+
         activity.startActivity(intentGameEnded);
         destroy();
     }

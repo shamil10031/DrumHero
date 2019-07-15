@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.ShomazzApp.drumhero.game.Game;
 import com.ShomazzApp.drumhero.utils.MySurfaceView;
 
 public class GameEndedActivity extends Activity {
@@ -98,8 +99,17 @@ public class GameEndedActivity extends Activity {
 
     public void startNeededActivity() {
         if (tappedButtonId == R.id.btnRestart) {
-            intentGameActivity.putExtra(getString(R.string.GameIntentSongPath), nothing);
-            startActivity(intentMainMenu);
+            String songPath = getIntent().getStringExtra(getString(R.string.GameIntentSongPath));
+            String tableName = getIntent().getStringExtra(getString(R.string.GameIntentTableName));
+            String titleByName = getIntent().getStringExtra(getString(R.string.GameIntentTitleByName));
+            int difficulty = getIntent().getIntExtra(getString(R.string.GameIntentDifficulty), Game.EASY);
+
+            intentGameActivity.putExtra(getString(R.string.GameIntentSongPath), songPath);
+            intentGameActivity.putExtra(getString(R.string.GameIntentTitleByName), titleByName);
+            intentGameActivity.putExtra(getString(R.string.GameIntentTableName), tableName);
+            intentGameActivity.putExtra(getString(R.string.GameIntentDifficulty), difficulty);
+
+            startActivity(intentGameActivity);
         } else {
             startActivity(intentMainMenu);
         }
