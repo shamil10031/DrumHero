@@ -2,6 +2,7 @@ package com.ShomazzApp.drumhero.game;
 
 import android.graphics.Canvas;
 import android.graphics.RectF;
+import android.util.Log;
 
 import com.ShomazzApp.drumhero.utils.Constants;
 import com.ShomazzApp.drumhero.utils.MySurfaceView;
@@ -13,8 +14,8 @@ public class Note implements IUpdatable, IDrawable {
     private int maxHeight;
     private int minWidth;
     private int minHeight;
-    private int currentWidth;
-    private int currentHeight;
+    private float currentWidth;
+    private float currentHeight;
     private float widthCoff;
     private float heightCoff;
 
@@ -55,7 +56,7 @@ public class Note implements IUpdatable, IDrawable {
         minWidth = Constants.NoTappersMode.NOTE_MIN_WIDTH;
         minHeight = Constants.NoTappersMode.NOTE_MIN_HEIGHT;
         maxHeight = Constants.NoTappersMode.NOTE_MAX_HEIGHT;
-        maxWidth = Constants.NoTappersMode.NOTE_MIN_WIDTH;
+        maxWidth = Constants.NoTappersMode.NOTE_MAX_WIDTH;
         widthCoff = widthCoffNoTappers;
         heightCoff = heightCoffNoTappers;
         switch (numberOfLine) {
@@ -82,7 +83,7 @@ public class Note implements IUpdatable, IDrawable {
         minWidth = Constants.TappersMode.NOTE_MIN_WIDTH;
         minHeight = Constants.TappersMode.NOTE_MIN_HEIGHT;
         maxHeight = Constants.TappersMode.NOTE_MAX_HEIGHT;
-        maxWidth = Constants.TappersMode.NOTE_MIN_WIDTH;
+        maxWidth = Constants.TappersMode.NOTE_MAX_WIDTH;
         widthCoff = widthCoffDefault;
         heightCoff = heightCoffDefault;
         switch (numberOfLine) {
@@ -127,7 +128,7 @@ public class Note implements IUpdatable, IDrawable {
     public void draw(Canvas canvas) {
         if (!isDead) {
             noteRect = new RectF((x - currentWidth / 2) / MySurfaceView.sizeWidthCoff,
-                    (y - currentHeight / 2) / MySurfaceView.sizeHeightCoff,
+                    (y - currentHeight / 2) /MySurfaceView.sizeHeightCoff,
                     (x + currentWidth / 2) / MySurfaceView.sizeWidthCoff,
                     (y + currentHeight / 2) / MySurfaceView.sizeHeightCoff);
             switch (numberOfLine) {

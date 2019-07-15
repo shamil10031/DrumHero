@@ -146,7 +146,7 @@ public class Game implements OnTouchListener {
             }
         }
         db = new DBManager(activity.getApplicationContext(), this);
-        notes = db.getNotesWithDifficulty(tableName, false, this.difficulty);
+        notes = db.getNotesWithDifficulty(tableName, false, difficulty);
         System.out.println("From game notes.size() == " + notes.size());
     }
 
@@ -360,7 +360,6 @@ public class Game implements OnTouchListener {
                     && notes.get(i).getNoteY() <= DestroyLine.getDestroyLineY(noTappersMode)) {
                 currentSecond = System.currentTimeMillis() - startSongSecond;
                 if (!gameStarted &&
-                        //notes.get(0).getNoteY() - Note.getNoteHeight(isNoTappersMode) / 2 >= DestroyLine.getDestroyLineY(isNoTappersMode)
                         notes.get(0).getNoteY() - Note.getNoteHeight(noTappersMode) / 2 >=
                                 DestroyLine.getDestroyLineY(noTappersMode)
                 ) {
