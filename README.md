@@ -1,3 +1,5 @@
 # DrumHero
 Первое написанное мною полноценное приложение.
-Это игра, о которой можно почитать тут https://habr.com/ru/company/samsung/blog/449220/
+Это игра, о которой можно почитать на хабре:
+
+https://habr.com/ru/company/samsung/blog/449220/
